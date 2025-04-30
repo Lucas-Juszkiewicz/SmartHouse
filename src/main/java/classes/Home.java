@@ -1,3 +1,7 @@
+package classes;
+
+import util.Coordinates;
+
 import java.util.HashSet;
 
 public class Home {
