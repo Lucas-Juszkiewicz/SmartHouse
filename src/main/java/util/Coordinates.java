@@ -1,3 +1,5 @@
+package util;
+
 public record Coordinates(double latitude, double longitude) {
     @Override
     public String toString() {

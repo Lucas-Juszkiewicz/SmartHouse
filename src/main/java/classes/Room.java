@@ -1,3 +1,5 @@
+package classes;
+
 public class Room {
     String name;
     RoomType type;
