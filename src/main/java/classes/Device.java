@@ -1,27 +1,32 @@
 package classes;
 
 import enums.DeviceType;
+import util.DevicesStorage;
+import util.Warning;
 
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.UUID;
 
 public abstract class Device {
-    private Long id;
+    private UUID id;
     private String name;
     private DeviceType type;
-    private boolean isOn;
+    private boolean isOn = false;
+    private ArrayList<Warning> warnings;
 
-    public Device(Long id, String name, DeviceType type, boolean isOn) {
-        this.id = id;
+    public Device(String name, DeviceType type) {
+        this.id = DevicesStorage.generateId();
         this.name = name;
         this.type = type;
-        this.isOn = isOn;
+        System.out.println(DevicesStorage.addDevice(this));
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -45,19 +50,24 @@ public abstract class Device {
         return isOn;
     }
 
-    public void setOn(boolean on) {
+    public void setIsOn(boolean on) {
         isOn = on;
+    }
+
+    public ArrayList<Warning> getWarnings() {
+        return warnings;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Device device)) return false;
-        return Objects.equals(id, device.id) && Objects.equals(name, device.name) && type == device.type;
+        if (o == null || getClass() != o.getClass()) return false;
+        Device device = (Device) o;
+        return Objects.equals(id, device.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type);
+        return Objects.hashCode(id);
     }
 }
 

@@ -22,4 +22,5 @@ public enum DeviceType {
     HUMIDIFIER,
     DEHUMIDIFIER,
     GARAGE_DOOR_OPENER,
+    THERMOMETER,
 }

@@ -6,5 +6,9 @@ public enum RoomType {
     KITCHEN,
     BATHROOM,
     OFFICE,
+    BASEMENT,
+    ATTIC,
+    LIBRARY,
+    SWIMMING_POOL,
     OTHER
 }
