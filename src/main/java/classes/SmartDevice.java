@@ -1,24 +1,28 @@
 package classes;
 
 import enums.DeviceType;
+import enums.DeviceStatus;
 import util.DevicesStorage;
 import util.Warning;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Device {
+public abstract class SmartDevice {
     private UUID id;
     private String name;
     private DeviceType type;
-    private boolean isOn = false;
+    private DeviceStatus status;
+    private final EnumSet<DeviceStatus> possibleStatuses;
     private ArrayList<Warning> warnings;
 
-    public Device(String name, DeviceType type) {
+    public SmartDevice(String name, DeviceType type, EnumSet<DeviceStatus> possibleStatuses) {
         this.id = DevicesStorage.generateId();
         this.name = name;
         this.type = type;
+        this.possibleStatuses = possibleStatuses;
         System.out.println(DevicesStorage.addDevice(this));
     }
 
@@ -46,28 +50,44 @@ public abstract class Device {
         this.type = type;
     }
 
-    public boolean isOn() {
-        return isOn;
+    public DeviceStatus getStatus() {
+        return status;
     }
 
-    public void setIsOn(boolean on) {
-        isOn = on;
+    public void setStatus(DeviceStatus status) throws Exception {
+        if (possibleStatuses.contains(status)) {
+            this.status = status;
+        }else {
+            throw new IllegalArgumentException("Status " + status + " is not allowed for this device.");
+        }
     }
+
 
     public ArrayList<Warning> getWarnings() {
         return warnings;
     }
 
+    public abstract void simulate();
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Device device = (Device) o;
-        return Objects.equals(id, device.id);
+        SmartDevice smartDevice = (SmartDevice) o;
+        return Objects.equals(id, smartDevice.id);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "SmartDevice\n" +
+                "id: " + id + "\n" +
+                "name: " + name + "\n" +
+                "type: " + type + "\n" +
+                "status: " + "\n\n";
     }
 }
 

@@ -1,13 +1,13 @@
 package util;
 
 import Exceptions.DeviceNotFoundException;
-import classes.Device;
+import classes.SmartDevice;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class DevicesStorage {
-    private static HashMap<UUID, Device> devices = new HashMap<>();
+    private static HashMap<UUID, SmartDevice> devices = new HashMap<>();
 
     public static UUID generateId() {
         UUID id;
@@ -17,21 +17,21 @@ public class DevicesStorage {
         return id;
     }
 
-    public static String addDevice(Device device) {
-        devices.put(device.getId(), device);
+    public static String addDevice(SmartDevice smartDevice) {
+        devices.put(smartDevice.getId(), smartDevice);
         return "Device added";
     }
 
-    public static Device getDeviceById(UUID id) {
-        Device device = devices.get(id);
-        if (device == null) {
+    public static SmartDevice getDeviceById(UUID id) {
+        SmartDevice smartDevice = devices.get(id);
+        if (smartDevice == null) {
             throw new DeviceNotFoundException(id);
         }
-        return device;
+        return smartDevice;
     }
 
-    public static String updateDevice(Device device) {
-        devices.put(device.getId(), device);
+    public static String updateDevice(SmartDevice smartDevice) {
+        devices.put(smartDevice.getId(), smartDevice);
         return "Device updated";
     }
 

@@ -1,7 +1,5 @@
 package Exceptions;
 
-import classes.Device;
-
 import java.util.UUID;
 
 public class DeviceNotFoundException extends RuntimeException {
