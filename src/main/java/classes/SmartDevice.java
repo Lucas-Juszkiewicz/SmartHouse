@@ -5,23 +5,31 @@ import enums.DeviceStatus;
 import enums.RoomType;
 import util.DeviceRegistry;
 import util.HouseRegistry;
-import util.Warning;
+import util.TemperatureGenerator;
+import util.TerminalColors;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class SmartDevice{
+public abstract class SmartDevice {
     private UUID id;
     private String name;
     private DeviceType type;
     private DeviceStatus status;
     private final EnumSet<DeviceStatus> possibleStatuses;
-    private RoomType location;
+    private RoomType location; //in which room the device is located
     private ArrayList<Warning> warnings;
 
-    public SmartDevice(String name, DeviceType type, EnumSet<DeviceStatus> possibleStatuses, DeviceStatus status, RoomType location, UUID houseId) throws Exception {
+    public SmartDevice(
+            String name,
+            DeviceType type,
+            EnumSet<DeviceStatus> possibleStatuses,
+            DeviceStatus status,
+            RoomType location,
+            UUID houseId
+    ) throws Exception {
         this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
         this.type = type;
@@ -62,7 +70,7 @@ public abstract class SmartDevice{
     public void setStatus(DeviceStatus status) throws Exception {
         if (possibleStatuses.contains(status)) {
             this.status = status;
-        }else {
+        } else {
             throw new IllegalArgumentException("Status " + status + " is not allowed for this device.");
         }
     }
@@ -73,9 +81,9 @@ public abstract class SmartDevice{
 
     public void setLocation(RoomType location, UUID houseId) {
         House house = HouseRegistry.getInstance().getItem(houseId);
-        if(house.getRooms().contains(location)){
+        if (house.getRooms().contains(location)) {
             this.location = location;
-        }else {
+        } else {
             throw new IllegalArgumentException("This house does not contain this kind of room.");
         }
     }
@@ -101,10 +109,10 @@ public abstract class SmartDevice{
     @Override
     public String toString() {
         return "SmartDevice\n" +
-                "id: " + id + "\n" +
-                "name: " + name + "\n" +
-                "type: " + type + "\n" +
-                "status: " + "\n\n";
+                "id: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
+                "name: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
+                "type: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
+                "status: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n\n";
     }
 }
 

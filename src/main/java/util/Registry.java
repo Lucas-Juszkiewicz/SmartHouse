@@ -1,6 +1,6 @@
 package util;
 
-import Exceptions.NotFoundInRegistryException;
+import exceptions.NotFoundInRegistryException;
 
 import java.util.HashMap;
 import java.util.UUID;
