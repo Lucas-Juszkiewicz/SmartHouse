@@ -2,7 +2,9 @@ package classes;
 
 import enums.DeviceType;
 import enums.DeviceStatus;
-import util.DevicesStorage;
+import enums.RoomType;
+import util.DeviceRegistry;
+import util.HouseRegistry;
 import util.Warning;
 
 import java.util.ArrayList;
@@ -10,20 +12,23 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class SmartDevice {
+public abstract class SmartDevice{
     private UUID id;
     private String name;
     private DeviceType type;
     private DeviceStatus status;
     private final EnumSet<DeviceStatus> possibleStatuses;
+    private RoomType location;
     private ArrayList<Warning> warnings;
 
-    public SmartDevice(String name, DeviceType type, EnumSet<DeviceStatus> possibleStatuses) {
-        this.id = DevicesStorage.generateId();
+    public SmartDevice(String name, DeviceType type, EnumSet<DeviceStatus> possibleStatuses, DeviceStatus status, RoomType location, UUID houseId) throws Exception {
+        this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
         this.type = type;
         this.possibleStatuses = possibleStatuses;
-        System.out.println(DevicesStorage.addDevice(this));
+        setStatus(status);
+        setLocation(location, houseId);
+        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
 
     public UUID getId() {
@@ -62,6 +67,18 @@ public abstract class SmartDevice {
         }
     }
 
+    public RoomType getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(RoomType location, UUID houseId) {
+        House house = HouseRegistry.getInstance().getItem(houseId);
+        if(house.getRooms().contains(location)){
+            this.location = location;
+        }else {
+            throw new IllegalArgumentException("This house does not contain this kind of room.");
+        }
+    }
 
     public ArrayList<Warning> getWarnings() {
         return warnings;
