@@ -23,4 +23,6 @@ public enum DeviceType {
     DEHUMIDIFIER,
     GARAGE_DOOR_OPENER,
     THERMOMETER,
+    AIR_CONDITIONER,
+    RADIATOR
 }

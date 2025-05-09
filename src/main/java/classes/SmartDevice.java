@@ -14,13 +14,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class SmartDevice {
-    private UUID id;
-    private String name;
-    private DeviceType type;
+    private final UUID id;
+    private final String name;
+    private final DeviceType type;
     private DeviceStatus status;
     private final EnumSet<DeviceStatus> possibleStatuses;
     private RoomType location; //in which room the device is located
-    private ArrayList<Warning> warnings;
+    private final ArrayList<Warning> warnings = new ArrayList<>();
 
     public SmartDevice(
             String name,
@@ -43,24 +43,12 @@ public abstract class SmartDevice {
         return id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public DeviceType getType() {
         return type;
-    }
-
-    public void setType(DeviceType type) {
-        this.type = type;
     }
 
     public DeviceStatus getStatus() {
@@ -92,7 +80,12 @@ public abstract class SmartDevice {
         return warnings;
     }
 
+    public void updateTemperature() {
+
+    }
+
     public abstract void simulate();
+    public abstract void stopSimulation();
 
     @Override
     public boolean equals(Object o) {
@@ -108,11 +101,11 @@ public abstract class SmartDevice {
 
     @Override
     public String toString() {
-        return "SmartDevice\n" +
-                "id: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
-                "name: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
-                "type: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
-                "status: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n\n";
+        return "\tThis SmartDevice information \n" +
+                "\tid: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
+                "\tname: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
+                "\ttype: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
+                "\tstatus: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n\n";
     }
 }
 
