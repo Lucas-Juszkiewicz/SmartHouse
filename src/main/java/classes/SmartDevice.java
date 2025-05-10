@@ -16,7 +16,7 @@ import java.util.UUID;
 public abstract class SmartDevice {
     private final UUID id;
     private final String name;
-    private final DeviceType type;
+    private DeviceType type;
     private DeviceStatus status;
     private final EnumSet<DeviceStatus> possibleStatuses;
     private RoomType location; //in which room the device is located
@@ -33,6 +33,21 @@ public abstract class SmartDevice {
         this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
         this.type = type;
+        this.possibleStatuses = possibleStatuses;
+        setStatus(status);
+        setLocation(location, houseId);
+        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
+    }
+
+    public SmartDevice(
+            String name,
+            EnumSet<DeviceStatus> possibleStatuses,
+            DeviceStatus status,
+            RoomType location,
+            UUID houseId
+    ) throws Exception {
+        this.id = DeviceRegistry.getInstance().generateId();
+        this.name = name;
         this.possibleStatuses = possibleStatuses;
         setStatus(status);
         setLocation(location, houseId);

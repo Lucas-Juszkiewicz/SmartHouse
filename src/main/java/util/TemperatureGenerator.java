@@ -45,20 +45,12 @@ public abstract class TemperatureGenerator {
     public void generate(double minTemperature, double maxTemperature) {
         this.temperature = minTemperature + ((maxTemperature - minTemperature) / 2); // starter value
         while (isGenerating) {
-            double plusMinusOrZero = 0.1 + Math.random() * (3.00 - 0.1);
+            double plusMinusOrNoChange = 0.1 + Math.random() * (3.00 - 0.1);
             double oneTempStep = 0.1 + Math.random() * (2.00 - 0.1);
-            if (plusMinusOrZero > 1.6) {
-                if (this.temperature + oneTempStep >= maxTemperature) {
-                    temperature = maxTemperature;
-                } else {
-                    temperature = this.temperature + oneTempStep;
-                }
-            } else if (plusMinusOrZero < 1.3) {
-                if (this.temperature - oneTempStep <= minTemperature) {
-                    temperature = minTemperature;
-                } else {
-                    temperature = this.temperature - oneTempStep;
-                }
+            if (plusMinusOrNoChange > 1.6) {
+                temperature = Math.min(temperature + oneTempStep, maxTemperature);
+            } else if (plusMinusOrNoChange < 1.3) {
+                temperature = Math.max(temperature - oneTempStep, minTemperature);
             }
             temperatureHistory.add(temperature);
             for (SmartDevice observer : observers) {
