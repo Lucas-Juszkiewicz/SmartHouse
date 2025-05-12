@@ -4,18 +4,17 @@ import classes.SmartDevice;
 import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
+import interfaces.DeviceObserver;
+import interfaces.Switchable;
 import util.ThermostatTemperatureGenerator;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-public class Thermostat extends SmartDevice {
+public class Thermostat extends SmartDevice implements DeviceObserver {
     private final DeviceType type = DeviceType.THERMOSTAT;
     private double airTemperature;
     private double desiredTemperature;
-    private ArrayList<Double> temperatureHistory = new ArrayList<>();
+    private Deque<Double> temperatureHistory = new ArrayDeque<>();
     private final ArrayList<AirConditioner> airConditioners = new ArrayList<>();
     private final ArrayList<Radiator> radiators = new ArrayList<>();
 
@@ -24,10 +23,9 @@ public class Thermostat extends SmartDevice {
         this.desiredTemperature = desiredTemperature;
     }
 
-
-    public void updateTemperature() {
-        this.airTemperature = ThermostatTemperatureGenerator.getInstance().getTemperature();
-        temperatureHistory.add(airTemperature);
+    @Override
+    public DeviceType getType() {
+        return type;
     }
 
     public void showTemperatureHistory() {
@@ -42,7 +40,7 @@ public class Thermostat extends SmartDevice {
 
     }
 
-    public void addAirConditionerOrRadiator(SmartDevice device) {
+    public void connectAirConditionerOrRadiator(SmartDevice device) {
         String type = null;
 
         if (device instanceof AirConditioner airConditioner) {
@@ -63,7 +61,7 @@ public class Thermostat extends SmartDevice {
     }
 
 
-    public void removeAirConditionerOrRadiator(SmartDevice device) {
+    public void disconnectAirConditionerOrRadiator(SmartDevice device) {
         String type = null;
 
         if (device instanceof AirConditioner airConditioner) {
@@ -84,7 +82,7 @@ public class Thermostat extends SmartDevice {
     }
 
 
-    public void removeDevicesByLocation(RoomType location, DeviceType type) {
+    public void disconnectDevicesByLocation(RoomType location, DeviceType type) {
         List<? extends SmartDevice> toRemove = List.of();
         String typeName = type.toString();
 
@@ -120,7 +118,7 @@ public class Thermostat extends SmartDevice {
 
     @Override
     public void simulate() {
-        ThermostatTemperatureGenerator.getInstance().startGenerating(15.00, 40.00);
+        ThermostatTemperatureGenerator.getInstance().startGenerating(0.00, 40.00);
         ThermostatTemperatureGenerator.getInstance().addObserver(this);
     }
 
@@ -131,14 +129,22 @@ public class Thermostat extends SmartDevice {
     }
 
     @Override
+    public void updateObservedValue() {
+        this.airTemperature = ThermostatTemperatureGenerator.getInstance().getTemperature();
+        if (temperatureHistory.size() == 10) {
+            temperatureHistory.removeFirst();
+        }
+        temperatureHistory.addLast(this.airTemperature);
+
+        if (this.airTemperature + 3.00 > desiredTemperature) {
+
+        }
+    }
+
+    @Override
     public String toString() {
         return "Thermostat \n" +
                 "airTemperature: " + airTemperature + "\n" +
                 "desiredTemperature: " + desiredTemperature + "\n" + "\n" + super.toString();
-    }
-
-    @Override
-    public DeviceType getType() {
-        return type;
     }
 }

@@ -5,7 +5,6 @@ import enums.DeviceStatus;
 import enums.RoomType;
 import util.DeviceRegistry;
 import util.HouseRegistry;
-import util.TemperatureGenerator;
 import util.TerminalColors;
 
 import java.util.ArrayList;
@@ -18,9 +17,9 @@ public abstract class SmartDevice {
     private final String name;
     private DeviceType type;
     private DeviceStatus status;
-    private final EnumSet<DeviceStatus> possibleStatuses;
+    private EnumSet<DeviceStatus> possibleStatuses;
     private RoomType location; //in which room the device is located
-    private final ArrayList<Warning> warnings = new ArrayList<>();
+    private ArrayList<Warning> warnings = new ArrayList<>();
 
     public SmartDevice(
             String name,
@@ -54,6 +53,20 @@ public abstract class SmartDevice {
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
 
+    public SmartDevice(
+            String name,
+            DeviceStatus status,
+            RoomType location,
+            UUID houseId
+    ) throws Exception {
+        this.id = DeviceRegistry.getInstance().generateId();
+        this.name = name;
+        setStatus(status);
+        setLocation(location, houseId);
+        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
+    }
+
+
     public UUID getId() {
         return id;
     }
@@ -70,6 +83,10 @@ public abstract class SmartDevice {
         return status;
     }
 
+    public RoomType getLocation() {
+        return this.location;
+    }
+
     public void setStatus(DeviceStatus status) throws Exception {
         if (possibleStatuses.contains(status)) {
             this.status = status;
@@ -78,8 +95,8 @@ public abstract class SmartDevice {
         }
     }
 
-    public RoomType getLocation() {
-        return this.location;
+    public void setPossibleStatuses(EnumSet<DeviceStatus> possibleStatuses) {
+        this.possibleStatuses = possibleStatuses;
     }
 
     public void setLocation(RoomType location, UUID houseId) {
@@ -93,10 +110,6 @@ public abstract class SmartDevice {
 
     public ArrayList<Warning> getWarnings() {
         return warnings;
-    }
-
-    public void updateTemperature() {
-
     }
 
     public abstract void simulate();

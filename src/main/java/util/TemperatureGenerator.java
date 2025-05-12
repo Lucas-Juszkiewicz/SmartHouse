@@ -1,36 +1,18 @@
 package util;
 
-import classes.SmartDevice;
+import interfaces.ObservableDevice;
 
 import java.util.ArrayList;
 
 public abstract class TemperatureGenerator {
-    private final String name;
     private double temperature;
-    private final ArrayList<Double> temperatureHistory = new ArrayList<>();
     private boolean isGenerating = false;
-    private final ArrayList<SmartDevice> observers = new ArrayList<>();
 
-    public TemperatureGenerator(String name) {
-        this.name = name;
+
+    public TemperatureGenerator() {
     }
-
     public double getTemperature() {
         return temperature;
-    }
-
-    public ArrayList<Double> getTemperatureHistory() {
-        return temperatureHistory;
-    }
-
-    public void addObserver(SmartDevice observer) {
-        observers.add(observer);
-        System.out.printf("%s\n (%s) has been added to the %ss observers list", observer.getName(), observer.getId(), name);
-    }
-
-    public void removeObserver(SmartDevice observer) {
-        observers.remove(observer);
-        System.out.printf("%s\n (%s) has been removed from the %ss observers list.", observer.getName(), observer.getId(), name);
     }
 
     public void startGenerating(double minTemperature, double maxTemperature) {
@@ -52,12 +34,8 @@ public abstract class TemperatureGenerator {
             } else if (plusMinusOrNoChange < 1.3) {
                 temperature = Math.max(temperature - oneTempStep, minTemperature);
             }
-            temperatureHistory.add(temperature);
-            for (SmartDevice observer : observers) {
-                observer.updateTemperature();
-            }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
