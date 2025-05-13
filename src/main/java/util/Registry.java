@@ -1,5 +1,6 @@
 package util;
 
+import classes.devices.Thermostat;
 import exceptions.NotFoundInRegistryException;
 
 import java.util.HashMap;
@@ -24,6 +25,10 @@ public abstract class Registry<T> {
         return id;
     }
 
+    public HashMap<UUID, T> getItems() {
+        return items;
+    }
+
     public String addItem(UUID id, T item) {
         items.put(id, item);
         return String.format("%s added", this.itemClass);
@@ -37,8 +42,11 @@ public abstract class Registry<T> {
         return item;
     }
 
-    public Set<T> getItemByClass(Class<T> itemClass) {
-        return items.values().stream().filter(t -> t.getClass().equals(itemClass)).collect(Collectors.toSet());
+    public <T> Set<T> getItemByClass(Class<T> clazz) {
+        return items.values().stream()
+                .filter(clazz::isInstance)
+                .map(clazz::cast)
+                .collect(Collectors.toSet());
     }
 
     public String updateItem(UUID id, T item) {

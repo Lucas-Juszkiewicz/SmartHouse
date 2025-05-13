@@ -18,6 +18,7 @@ public abstract class SmartDevice {
     private DeviceType type;
     private DeviceStatus status;
     private EnumSet<DeviceStatus> possibleStatuses;
+    private final UUID houseId;
     private RoomType location; //in which room the device is located
     private ArrayList<Warning> warnings = new ArrayList<>();
 
@@ -34,6 +35,7 @@ public abstract class SmartDevice {
         this.type = type;
         this.possibleStatuses = possibleStatuses;
         setStatus(status);
+        this.houseId = houseId;
         setLocation(location, houseId);
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
@@ -49,6 +51,7 @@ public abstract class SmartDevice {
         this.name = name;
         this.possibleStatuses = possibleStatuses;
         setStatus(status);
+        this.houseId = houseId;
         setLocation(location, houseId);
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
@@ -62,6 +65,7 @@ public abstract class SmartDevice {
         this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
         setStatus(status);
+        this.houseId = houseId;
         setLocation(location, houseId);
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
@@ -81,6 +85,10 @@ public abstract class SmartDevice {
 
     public DeviceStatus getStatus() {
         return status;
+    }
+
+    public UUID getHouseId() {
+        return houseId;
     }
 
     public RoomType getLocation() {

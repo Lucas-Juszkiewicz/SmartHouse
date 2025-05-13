@@ -10,6 +10,7 @@ import util.DeviceRegistry;
 import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class AirConditioner extends SmartDevice implements Switchable {
@@ -86,7 +87,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
 
     @Override
     public void simulate() {
-        DeviceRegistry.getInstance().getItemByClass(Thermostat.class);
+        Set<Thermostat> thermostats = DeviceRegistry.getInstance().getItemByClass(Thermostat.class);
     }
 
     @Override
