@@ -15,6 +15,10 @@ public abstract class TemperatureGenerator {
         return temperature;
     }
 
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
+
     public void startGenerating(double minTemperature, double maxTemperature) {
         isGenerating = true;
         new Thread(() -> generate(minTemperature, maxTemperature)).start();

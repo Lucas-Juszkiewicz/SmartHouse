@@ -7,11 +7,14 @@ import interfaces.ObservableDevice;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-public class ThermostatTemperatureGenerator extends TemperatureGenerator  implements ObservableDevice<Thermostat> {
+public class ThermostatTemperatureGenerator extends TemperatureGenerator implements ObservableDevice<Thermostat> {
     private static final ThermostatTemperatureGenerator instance = new ThermostatTemperatureGenerator("Thermostat temperature");
     private final String name;
     private final ArrayList<Thermostat> observers = new ArrayList<>();
-    private final EnumSet<SimulationStatus> possibleSimulationStatuses = EnumSet.of(SimulationStatus.HEATING, SimulationStatus.COOLING);
+    private final EnumSet<SimulationStatus> possibleSimulationStatuses = EnumSet.of(
+            SimulationStatus.HEATING,
+            SimulationStatus.COOLING,
+            SimulationStatus.STANDBY);
     private Enum<SimulationStatus> simulationStatus;
 
     public ThermostatTemperatureGenerator(String name) {
@@ -52,13 +55,29 @@ public class ThermostatTemperatureGenerator extends TemperatureGenerator  implem
 
     public void simulateCooling() {
         this.setSimulationStatus(SimulationStatus.COOLING);
-        while(getSimulationStatus().equals(SimulationStatus.COOLING)) {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        new Thread(() -> {
+            while (getSimulationStatus().equals(SimulationStatus.COOLING)) {
+                this.setTemperature(this.getTemperature() - 0.5);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        }
+        });
+    }
 
+    public void simulateHeating() {
+        this.setSimulationStatus(SimulationStatus.HEATING);
+        new Thread(() -> {
+            while (getSimulationStatus().equals(SimulationStatus.HEATING)) {
+                this.setTemperature(this.getTemperature() + 0.5);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
     }
 }

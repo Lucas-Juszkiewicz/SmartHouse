@@ -4,6 +4,7 @@ import classes.SmartDevice;
 import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
+import enums.SimulationStatus;
 import interfaces.Switchable;
 import util.DeviceRegistry;
 import util.ThermostatTemperatureGenerator;
@@ -26,8 +27,18 @@ public class AirConditioner extends SmartDevice implements Switchable {
     }
 
     @Override
-    public void turnOn() throws Exception {
-        this.setStatus(DeviceStatus.ON);
+    public void turnOn() {
+        if (this.getStatus() != DeviceStatus.NEEDS_CLEANING
+                &&
+                this.getStatus() != DeviceStatus.NEEDS_REPAIR) {
+            try {
+                this.setStatus(DeviceStatus.ON);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }else {
+            System.out.printf("AirConditioner (%s) can't be turned on. It %s", this.getId(), this.getStatus().toString());
+        }
     }
 
     @Override
@@ -40,31 +51,42 @@ public class AirConditioner extends SmartDevice implements Switchable {
         return getStatus().equals(DeviceStatus.ON);
     }
 
-    public void connectToThermostat(UUID thermostatId){
+    public void connectToThermostat(UUID thermostatId) {
         this.connectedThermostatId = thermostatId;
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(thermostatId);
-        if(thermostat.getClass() == Thermostat.class){
+        if (thermostat.getClass() == Thermostat.class) {
             ((Thermostat) thermostat).connectAirConditionerOrRadiator(this);
-        }else {
+        } else {
             DeviceType type = thermostat.getType();
             System.out.printf("AirConditioner can't be connected to the device with type %s\n", type);
         }
     }
 
-    public void disconnectFromThermostat(){
+    public void disconnectFromThermostat() {
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(this.connectedThermostatId);
         ((Thermostat) thermostat).disconnectAirConditionerOrRadiator(this);
     }
 
-    public void startCooling(){
-        if(isOn()){
+    public void startCooling() {
+        if (isOn()) {
             ThermostatTemperatureGenerator.getInstance().simulateCooling();
+        } else {
+            System.out.printf("AirConditioner (%s) is off\n)", this.getId());
         }
+    }
+
+    public void stopCooling() {
+        try {
+            this.setStatus(DeviceStatus.STANDBY);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        ThermostatTemperatureGenerator.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
     }
 
     @Override
     public void simulate() {
-
+        DeviceRegistry.getInstance().getItemByClass(Thermostat.class);
     }
 
     @Override

@@ -4,8 +4,10 @@ import classes.SmartDevice;
 import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
+import enums.SimulationStatus;
 import interfaces.Switchable;
 import util.DeviceRegistry;
+import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
 import java.util.UUID;
@@ -24,8 +26,16 @@ public class Radiator extends SmartDevice implements Switchable {
     }
 
     @Override
-    public void turnOn() throws Exception {
-        this.setStatus(DeviceStatus.ON);
+    public void turnOn() {
+        if (this.getStatus() != DeviceStatus.NEEDS_REPAIR) {
+            try {
+                this.setStatus(DeviceStatus.ON);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }else {
+            System.out.printf("Radiator (%s) can't be turned on. It %s", this.getId(), this.getStatus().toString());
+        }
     }
 
     @Override
@@ -55,7 +65,13 @@ public class Radiator extends SmartDevice implements Switchable {
     }
 
     public void startHeating(){
+        if(isOn()){
+            ThermostatTemperatureGenerator.getInstance().simulateHeating();
+        }
+    }
 
+    public void stopHeating(){
+        ThermostatTemperatureGenerator.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
     }
 
     @Override

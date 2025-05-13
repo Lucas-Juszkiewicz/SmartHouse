@@ -3,7 +3,10 @@ package util;
 import exceptions.NotFoundInRegistryException;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class Registry<T> {
     private final HashMap<UUID, T> items = new HashMap<>();
@@ -32,6 +35,10 @@ public abstract class Registry<T> {
             throw new NotFoundInRegistryException(id, itemClass);
         }
         return item;
+    }
+
+    public Set<T> getItemByClass(Class<T> itemClass) {
+        return items.values().stream().filter(t -> t.getClass().equals(itemClass)).collect(Collectors.toSet());
     }
 
     public String updateItem(UUID id, T item) {

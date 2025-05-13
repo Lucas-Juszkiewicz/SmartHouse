@@ -6,9 +6,11 @@ import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
 import interfaces.Switchable;
+import util.Rule;
 import util.ThermostatTemperatureGenerator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Thermostat extends SmartDevice implements DeviceObserver {
     private final DeviceType type = DeviceType.THERMOSTAT;
@@ -136,8 +138,13 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         }
         temperatureHistory.addLast(this.airTemperature);
 
-        if (this.airTemperature + 3.00 > desiredTemperature) {
-
+        if (this.airTemperature + 1.00 > desiredTemperature) {
+            airConditioners.forEach(AirConditioner::startCooling);
+        }else if (this.airTemperature - 1.00 < desiredTemperature) {
+            radiators.forEach(Radiator::startHeating);
+        }else {
+            airConditioners.forEach(AirConditioner::stopCooling);
+            radiators.forEach(Radiator::stopHeating);
         }
     }
 

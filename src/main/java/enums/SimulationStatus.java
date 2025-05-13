@@ -1,5 +1,5 @@
 package enums;
 
 public enum SimulationStatus {
-    COOLING, HEATING
+    COOLING, HEATING, STANDBY,
 }
