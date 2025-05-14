@@ -17,8 +17,8 @@ public class AirConditioner extends SmartDevice implements Switchable {
     private final DeviceType type = DeviceType.AIR_CONDITIONER;
     private UUID connectedThermostatId;
 
-    public AirConditioner(String name, DeviceStatus status, RoomType location, UUID houseId) throws Exception {
-        super(name, status, location, houseId);
+    public AirConditioner(String name, DeviceStatus status, RoomType roomType, UUID houseId) throws Exception {
+        super(name, roomType, houseId);
         this.setPossibleStatuses(EnumSet.of(
                 DeviceStatus.ON,
                 DeviceStatus.OFF,

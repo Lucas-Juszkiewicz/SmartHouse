@@ -7,10 +7,7 @@ import util.DeviceRegistry;
 import util.HouseRegistry;
 import util.TerminalColors;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class SmartDevice {
     private final UUID id;
@@ -19,54 +16,22 @@ public abstract class SmartDevice {
     private DeviceStatus status;
     private EnumSet<DeviceStatus> possibleStatuses;
     private final UUID houseId;
-    private RoomType location; //in which room the device is located
+    private String houseName;
+    private RoomType roomType; //in which room the device is located
+    private String location;
     private ArrayList<Warning> warnings = new ArrayList<>();
 
     public SmartDevice(
             String name,
-            DeviceType type,
-            EnumSet<DeviceStatus> possibleStatuses,
-            DeviceStatus status,
-            RoomType location,
+//            DeviceStatus status,
+            RoomType roomType,
             UUID houseId
     ) throws Exception {
         this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
-        this.type = type;
-        this.possibleStatuses = possibleStatuses;
-        setStatus(status);
+//        setStatus(status);
         this.houseId = houseId;
-        setLocation(location, houseId);
-        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
-    }
-
-    public SmartDevice(
-            String name,
-            EnumSet<DeviceStatus> possibleStatuses,
-            DeviceStatus status,
-            RoomType location,
-            UUID houseId
-    ) throws Exception {
-        this.id = DeviceRegistry.getInstance().generateId();
-        this.name = name;
-        this.possibleStatuses = possibleStatuses;
-        setStatus(status);
-        this.houseId = houseId;
-        setLocation(location, houseId);
-        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
-    }
-
-    public SmartDevice(
-            String name,
-            DeviceStatus status,
-            RoomType location,
-            UUID houseId
-    ) throws Exception {
-        this.id = DeviceRegistry.getInstance().generateId();
-        this.name = name;
-        setStatus(status);
-        this.houseId = houseId;
-        setLocation(location, houseId);
+        setLocation(roomType, houseId);
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
 
@@ -91,7 +56,7 @@ public abstract class SmartDevice {
         return houseId;
     }
 
-    public RoomType getLocation() {
+    public String getLocation() {
         return this.location;
     }
 
@@ -107,10 +72,17 @@ public abstract class SmartDevice {
         this.possibleStatuses = possibleStatuses;
     }
 
-    public void setLocation(RoomType location, UUID houseId) {
+    private void setLocation(RoomType roomType, UUID houseId) {
         House house = HouseRegistry.getInstance().getItem(houseId);
-        if (house.getRooms().contains(location)) {
-            this.location = location;
+        if (house.getRooms().stream().anyMatch(r -> r.getType() == roomType)) {
+            this.houseName = house.getName();
+            String roomTypeStr =
+                    roomType.name()
+                            .toLowerCase(Locale.ROOT)
+                            .replace("_", " ");
+            String roomTypeStrFirstUppercase =
+                    Character.toUpperCase(roomTypeStr.charAt(0)) + roomTypeStr.substring(1);
+            this.location = roomTypeStrFirstUppercase + " in  " + this.houseName + "'";
         } else {
             throw new IllegalArgumentException("This house does not contain this kind of room.");
         }
@@ -121,6 +93,7 @@ public abstract class SmartDevice {
     }
 
     public abstract void simulate();
+
     public abstract void stopSimulation();
 
     @Override
@@ -137,6 +110,15 @@ public abstract class SmartDevice {
 
     @Override
     public String toString() {
+        return "SmartDevice \n" +
+                "id: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
+                "name: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
+                "type: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
+                "status: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n" +
+                "location: " + TerminalColors.ANSI_YELLOW + location + TerminalColors.ANSI_RESET + "\n";
+    }
+
+    public String toStringNested() {
         return "\tThis SmartDevice information \n" +
                 "\tid: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
                 "\tname: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +

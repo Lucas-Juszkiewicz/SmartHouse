@@ -16,8 +16,8 @@ public class Radiator extends SmartDevice implements Switchable {
     private final DeviceType type = DeviceType.RADIATOR;
     private UUID connectedThermostatId;
 
-    public Radiator(String name, DeviceStatus status, RoomType location, UUID houseId) throws Exception {
-        super(name, status, location, houseId);
+    public Radiator(String name, RoomType roomType, UUID houseId) throws Exception {
+        super(name, roomType, houseId);
         this.setPossibleStatuses(EnumSet.of(
                 DeviceStatus.ON,
                 DeviceStatus.OFF,

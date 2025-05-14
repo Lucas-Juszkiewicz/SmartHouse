@@ -5,12 +5,9 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
-import interfaces.Switchable;
-import util.Rule;
 import util.ThermostatTemperatureGenerator;
-
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 public class Thermostat extends SmartDevice implements DeviceObserver {
     private final DeviceType type = DeviceType.THERMOSTAT;
@@ -20,9 +17,17 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     private final ArrayList<AirConditioner> airConditioners = new ArrayList<>();
     private final ArrayList<Radiator> radiators = new ArrayList<>();
 
-    public Thermostat(String name, EnumSet<DeviceStatus> possibleStatuses, DeviceStatus status, RoomType location, UUID houseId, Double desiredTemperature) throws Exception {
-        super(name, possibleStatuses, status, location, houseId);
+    public Thermostat(String name, DeviceStatus status, RoomType roomType, UUID houseId, Double desiredTemperature) throws Exception {
+        super(name, roomType, houseId);
         this.desiredTemperature = desiredTemperature;
+        setPossibleStatuses(
+                EnumSet.of(
+                        DeviceStatus.NEEDS_REPAIR,
+                        DeviceStatus.NEEDS_UPDATE,
+                        DeviceStatus.OK
+                )
+        );
+        setStatus(status);
     }
 
     @Override
