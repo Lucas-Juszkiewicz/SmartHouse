@@ -5,12 +5,14 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
+import util.TerminalColors;
 import util.ThermostatTemperatureGenerator;
+
 import java.util.*;
 
 
 public class Thermostat extends SmartDevice implements DeviceObserver {
-    private final DeviceType type = DeviceType.THERMOSTAT;
+    //    private final DeviceType type = DeviceType.THERMOSTAT;
     private double airTemperature;
     private double desiredTemperature;
     private Deque<Double> temperatureHistory = new ArrayDeque<>();
@@ -18,7 +20,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     private final ArrayList<Radiator> radiators = new ArrayList<>();
 
     public Thermostat(String name, DeviceStatus status, RoomType roomType, UUID houseId, Double desiredTemperature) throws Exception {
-        super(name, roomType, houseId);
+        super(name, DeviceType.THERMOSTAT, roomType, houseId);
         this.desiredTemperature = desiredTemperature;
         setPossibleStatuses(
                 EnumSet.of(
@@ -28,11 +30,6 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
                 )
         );
         setStatus(status);
-    }
-
-    @Override
-    public DeviceType getType() {
-        return type;
     }
 
     public void showTemperatureHistory() {
@@ -145,9 +142,9 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
 
         if (this.airTemperature + 1.00 > desiredTemperature) {
             airConditioners.forEach(AirConditioner::startCooling);
-        }else if (this.airTemperature - 1.00 < desiredTemperature) {
+        } else if (this.airTemperature - 1.00 < desiredTemperature) {
             radiators.forEach(Radiator::startHeating);
-        }else {
+        } else {
             airConditioners.forEach(AirConditioner::stopCooling);
             radiators.forEach(Radiator::stopHeating);
         }
@@ -155,8 +152,16 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
 
     @Override
     public String toString() {
-        return "Thermostat \n" +
-                "airTemperature: " + airTemperature + "\n" +
-                "desiredTemperature: " + desiredTemperature + "\n" + "\n" + super.toString();
+        return TerminalColors.ANSI_YELLOW + "Thermostat \n" + TerminalColors.ANSI_RESET +
+                "airTemperature: " + TerminalColors.ANSI_YELLOW + airTemperature + TerminalColors.ANSI_RESET + "\n" +
+                "desiredTemperature: " + TerminalColors.ANSI_YELLOW + desiredTemperature + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tThermostat \n" + TerminalColors.ANSI_RESET +
+                "\tairTemperature: " + TerminalColors.ANSI_YELLOW + airTemperature + TerminalColors.ANSI_RESET + "\n" +
+                "\tdesiredTemperature: " + TerminalColors.ANSI_YELLOW + desiredTemperature + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
     }
 }

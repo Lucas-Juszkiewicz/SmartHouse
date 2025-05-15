@@ -23,14 +23,17 @@ public abstract class SmartDevice {
 
     public SmartDevice(
             String name,
+            DeviceType type,
 //            DeviceStatus status,
             RoomType roomType,
             UUID houseId
     ) throws Exception {
         this.id = DeviceRegistry.getInstance().generateId();
         this.name = name;
+        this.type = type;
 //        setStatus(status);
         this.houseId = houseId;
+        this.roomType = roomType;
         setLocation(roomType, houseId);
         System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
     }
@@ -82,10 +85,14 @@ public abstract class SmartDevice {
                             .replace("_", " ");
             String roomTypeStrFirstUppercase =
                     Character.toUpperCase(roomTypeStr.charAt(0)) + roomTypeStr.substring(1);
-            this.location = roomTypeStrFirstUppercase + " in  " + this.houseName + "'";
+            this.location = roomTypeStrFirstUppercase + " in '" + this.houseName + "'";
         } else {
             throw new IllegalArgumentException("This house does not contain this kind of room.");
         }
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
     }
 
     public ArrayList<Warning> getWarnings() {
@@ -110,8 +117,7 @@ public abstract class SmartDevice {
 
     @Override
     public String toString() {
-        return "SmartDevice \n" +
-                "id: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
+        return "id: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
                 "name: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
                 "type: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
                 "status: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n" +
@@ -119,11 +125,10 @@ public abstract class SmartDevice {
     }
 
     public String toStringNested() {
-        return "\tThis SmartDevice information \n" +
-                "\tid: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
+        return "\tid: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
                 "\tname: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
                 "\ttype: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
-                "\tstatus: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n\n";
+                "\tstatus: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET;
     }
 }
 

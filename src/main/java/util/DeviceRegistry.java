@@ -26,7 +26,7 @@ public class DeviceRegistry extends Registry<SmartDevice> {
 
     public List<SmartDevice> getDeviceByRoom(RoomType roomType, UUID houseId) {
         return getDevicesByHouse(houseId).stream()
-                .filter(device -> device.getLocation().equals(roomType))
+                .filter(device -> device.getRoomType().equals(roomType))
                 .toList();
     }
 }

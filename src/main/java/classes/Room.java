@@ -5,6 +5,7 @@ import util.DeviceRegistry;
 import util.HouseRegistry;
 import util.TerminalColors;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -61,9 +62,20 @@ public class Room {
     }
 
     public String toStringNested() {
+        List<SmartDevice> smartDevices = getSmartDevices();
+        int numberOfDevices = getSmartDevices().size();
+        StringBuilder smartDevicesSB = new StringBuilder();
+        for (SmartDevice smartDevice : smartDevices) {
+            String stringNested = smartDevice.toStringNested();
+            stringNested = stringNested.replace("\t", "\t\t");
+            smartDevicesSB.append(stringNested);
+        }
+        String smartDevicesStr = smartDevicesSB.toString();
         return TerminalColors.ANSI_BRIGHT_YELLOW + "\tRoom\n" + TerminalColors.ANSI_RESET +
                 "\tname: " + name + "\n" +
                 "\ttype: " + type + "\n" +
-                "\tarea: " + area + "m^2";
+                "\tarea: " + area + "m^2" + "\n" +
+                "\tNumber of devices: " + numberOfDevices + "\n" +
+                smartDevicesStr;
     }
 }

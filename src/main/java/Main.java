@@ -1,5 +1,6 @@
 import classes.House;
 import classes.Room;
+import classes.devices.Radiator;
 import classes.devices.Thermostat;
 import enums.DeviceStatus;
 import enums.RoomType;
@@ -24,13 +25,16 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        System.out.println(house);
-//        System.out.println(room);
-        System.out.println(thermostat);
 
-        // Need to check why thermostats type is null
-        // toString in progress
-        // Need to get rid of 'SmartDevice' title in Smart device toString
+        Radiator radiator;
+        try {
+            radiator = new Radiator("Radiator1", RoomType.LIVING_ROOM, house.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(house);
+//        System.out.println(basement);
+//        System.out.println(thermostat);
 
     }
 }

@@ -57,13 +57,13 @@ public class House {
     public String toString() {
         StringBuilder nestedRooms = new StringBuilder();
         rooms.forEach(room -> {
-            nestedRooms.append(room.toStringNested());
+            nestedRooms.append(room.toStringNested()).append("\n");
         });
         return TerminalColors.ANSI_BRIGHT_YELLOW + "House\n" + TerminalColors.ANSI_RESET +
                 "id: " + id + "\n" +
                 "name: " + name + "\n" +
                 "coordinates: " + coordinates + "\n" +
                 "area: " + area + "m^2" + "\n" +
-                "rooms:\n" + nestedRooms + "\n";
+                "rooms:\n" + nestedRooms;
     }
 }

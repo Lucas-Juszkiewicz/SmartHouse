@@ -7,22 +7,24 @@ import enums.RoomType;
 import enums.SimulationStatus;
 import interfaces.Switchable;
 import util.DeviceRegistry;
+import util.TerminalColors;
 import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
 import java.util.UUID;
 
 public class Radiator extends SmartDevice implements Switchable {
-    private final DeviceType type = DeviceType.RADIATOR;
+//    private final DeviceType type = DeviceType.RADIATOR;
     private UUID connectedThermostatId;
 
     public Radiator(String name, RoomType roomType, UUID houseId) throws Exception {
-        super(name, roomType, houseId);
+        super(name, DeviceType.RADIATOR, roomType, houseId);
         this.setPossibleStatuses(EnumSet.of(
                 DeviceStatus.ON,
                 DeviceStatus.OFF,
                 DeviceStatus.STANDBY,
                 DeviceStatus.NEEDS_REPAIR));
+        this.setStatus(DeviceStatus.ON);
     }
 
     @Override
@@ -82,5 +84,19 @@ public class Radiator extends SmartDevice implements Switchable {
     @Override
     public void stopSimulation() {
 
+    }
+
+    @Override
+    public String toString() {
+        return TerminalColors.ANSI_YELLOW + "Radiator \n" + TerminalColors.ANSI_RESET +
+                "Connected thermostat id: " + TerminalColors.ANSI_YELLOW + connectedThermostatId + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    @Override
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tRadiator \n" + TerminalColors.ANSI_RESET +
+                "\tConnected thermostat id: " + TerminalColors.ANSI_YELLOW + connectedThermostatId + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
     }
 }
