@@ -68,7 +68,7 @@ public class Room {
         for (SmartDevice smartDevice : smartDevices) {
             String stringNested = smartDevice.toStringNested();
             stringNested = stringNested.replace("\t", "\t\t");
-            smartDevicesSB.append(stringNested);
+            smartDevicesSB.append(stringNested).append("\n");
         }
         String smartDevicesStr = smartDevicesSB.toString();
         return TerminalColors.ANSI_BRIGHT_YELLOW + "\tRoom\n" + TerminalColors.ANSI_RESET +
@@ -76,6 +76,7 @@ public class Room {
                 "\ttype: " + type + "\n" +
                 "\tarea: " + area + "m^2" + "\n" +
                 "\tNumber of devices: " + numberOfDevices + "\n" +
-                smartDevicesStr;
+                smartDevicesStr +
+                "\t---   ---   ---   ---   ---   ---   ---   ---";
     }
 }

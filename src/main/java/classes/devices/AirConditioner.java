@@ -7,6 +7,7 @@ import enums.RoomType;
 import enums.SimulationStatus;
 import interfaces.Switchable;
 import util.DeviceRegistry;
+import util.TerminalColors;
 import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
@@ -25,6 +26,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
                 DeviceStatus.STANDBY,
                 DeviceStatus.NEEDS_REPAIR,
                 DeviceStatus.NEEDS_CLEANING));
+        setStatus(status);
     }
 
     @Override
@@ -93,5 +95,19 @@ public class AirConditioner extends SmartDevice implements Switchable {
     @Override
     public void stopSimulation() {
 
+    }
+
+    @Override
+    public String toString() {
+        return TerminalColors.ANSI_YELLOW + "AirConditioner \n" + TerminalColors.ANSI_RESET +
+                "Connected thermostat id: " + TerminalColors.ANSI_YELLOW + connectedThermostatId + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    @Override
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tAirConditioner \n" + TerminalColors.ANSI_RESET +
+                "\tConnected thermostat id: " + TerminalColors.ANSI_YELLOW + connectedThermostatId + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
     }
 }

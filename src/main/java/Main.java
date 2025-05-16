@@ -1,5 +1,6 @@
 import classes.House;
 import classes.Room;
+import classes.devices.AirConditioner;
 import classes.devices.Radiator;
 import classes.devices.Thermostat;
 import enums.DeviceStatus;
@@ -32,9 +33,18 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        radiator.connectToThermostat(thermostat.getId());
+        AirConditioner airConditioner;
+        try {
+            airConditioner = new AirConditioner("AC1", DeviceStatus.ON, RoomType.LIVING_ROOM, house.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        airConditioner.connectToThermostat(thermostat.getId());
+        thermostat.simulate();
         System.out.println(house);
-//        System.out.println(basement);
-//        System.out.println(thermostat);
+        thermostat.showTemperatureHistory();
 
     }
 }

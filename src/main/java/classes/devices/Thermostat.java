@@ -16,6 +16,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     private double airTemperature;
     private double desiredTemperature;
     private Deque<Double> temperatureHistory = new ArrayDeque<>();
+    private boolean stopShowTemperatureHistory = false;
     private final ArrayList<AirConditioner> airConditioners = new ArrayList<>();
     private final ArrayList<Radiator> radiators = new ArrayList<>();
 
@@ -33,6 +34,23 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     }
 
     public void showTemperatureHistory() {
+        this.stopShowTemperatureHistory = false;
+            new Thread(() -> {
+                while(!stopShowTemperatureHistory) {
+                    String string = temperatureHistory.toString();
+                    System.out.println(string);
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            });
+        System.out.println("If you want to stop press ENTER.");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine(); // This will wait for the user to press Enter
+        System.out.println("Stopping...");
+        scanner.close();
 
     }
 
@@ -87,7 +105,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
 
 
     public void disconnectDevicesByLocation(RoomType location, DeviceType type) {
-        List<? extends SmartDevice> toRemove = List.of();
+        List<? extends SmartDevice> toRemove;
         String typeName = type.toString();
 
         switch (type) {

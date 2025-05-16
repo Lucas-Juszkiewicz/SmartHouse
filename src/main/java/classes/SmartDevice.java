@@ -128,7 +128,7 @@ public abstract class SmartDevice {
         return "\tid: " + TerminalColors.ANSI_YELLOW + id + TerminalColors.ANSI_RESET + "\n" +
                 "\tname: " + TerminalColors.ANSI_YELLOW + name + TerminalColors.ANSI_RESET + "\n" +
                 "\ttype: " + TerminalColors.ANSI_YELLOW + type + TerminalColors.ANSI_RESET + "\n" +
-                "\tstatus: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET;
+                "\tstatus: " + TerminalColors.ANSI_YELLOW + status + TerminalColors.ANSI_RESET + "\n";
     }
 }
 
