@@ -45,6 +45,14 @@ public class Main {
         thermostat.simulate();
         System.out.println(house);
         thermostat.showTemperatureHistory();
+        thermostat.stopSimulation();
+
+        // 'ThermostatTemperatureGenerator' this should have name like 'FirstFloorTemperature'
+        // Does Thermostat should implement SensorDevice?
+        // I should take a look on...
+        //ThermostatTemperatureGenerator
+        //Thermostat
+        //TemperatureGenerator
 
     }
 }

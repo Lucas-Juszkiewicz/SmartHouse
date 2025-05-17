@@ -2,12 +2,11 @@ package util;
 
 import classes.devices.Thermostat;
 import enums.SimulationStatus;
-import interfaces.ObservableDevice;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-public class ThermostatTemperatureGenerator extends TemperatureGenerator implements ObservableDevice<Thermostat> {
+public class ThermostatTemperatureGenerator extends TemperatureGenerator<Thermostat> {
     private static final ThermostatTemperatureGenerator instance = new ThermostatTemperatureGenerator("Thermostat temperature");
     private final String name;
     private final ArrayList<Thermostat> observers = new ArrayList<>();
@@ -52,6 +51,8 @@ public class ThermostatTemperatureGenerator extends TemperatureGenerator impleme
             observer.updateObservedValue();
         }
     }
+
+
 
     public void simulateCooling() {
         this.setSimulationStatus(SimulationStatus.COOLING);

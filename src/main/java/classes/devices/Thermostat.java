@@ -5,12 +5,13 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
+import interfaces.ObservableDevice;
 import util.TerminalColors;
 import util.ThermostatTemperatureGenerator;
 
 import java.util.*;
 
-
+// Should implement ObservableDevice<SmartDevice>
 public class Thermostat extends SmartDevice implements DeviceObserver {
     //    private final DeviceType type = DeviceType.THERMOSTAT;
     private double airTemperature;
@@ -37,19 +38,19 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         this.stopShowTemperatureHistory = false;
             new Thread(() -> {
                 while(!stopShowTemperatureHistory) {
-                    String string = temperatureHistory.toString();
-                    System.out.println(string);
+                    double airTemperature1 = this.airTemperature;
+                    System.out.println("*"+airTemperature1);
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            });
+            }).start();
         System.out.println("If you want to stop press ENTER.");
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine(); // This will wait for the user to press Enter
-        System.out.println("Stopping...");
+        this.stopShowTemperatureHistory = true;
         scanner.close();
 
     }
@@ -61,7 +62,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     public void stopTemperatureControl() {
 
     }
-
+    //This method should be named 'addObserver'
     public void connectAirConditionerOrRadiator(SmartDevice device) {
         String type = null;
 
@@ -82,7 +83,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         }
     }
 
-
+    // This method should be named 'removeObserver'
     public void disconnectAirConditionerOrRadiator(SmartDevice device) {
         String type = null;
 
@@ -103,22 +104,25 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         }
     }
 
-
-    public void disconnectDevicesByLocation(RoomType location, DeviceType type) {
+    // should be named 'removeObserverByLocation
+    public void disconnectDevicesByLocation(RoomType roomType, DeviceType type) {
         List<? extends SmartDevice> toRemove;
         String typeName = type.toString();
+        String location;
 
         switch (type) {
             case AIR_CONDITIONER -> {
                 toRemove = airConditioners.stream()
-                        .filter(ac -> ac.getLocation().equals(location))
+                        .filter(ac -> ac.getRoomType().equals(roomType))
                         .toList();
+                location = toRemove.getFirst().getLocation();
                 airConditioners.removeAll(toRemove);
             }
             case RADIATOR -> {
                 toRemove = radiators.stream()
-                        .filter(rad -> rad.getLocation().equals(location))
+                        .filter(rad -> rad.getRoomType().equals(roomType))
                         .toList();
+                location = toRemove.getFirst().getLocation();
                 radiators.removeAll(toRemove);
             }
             default -> {
