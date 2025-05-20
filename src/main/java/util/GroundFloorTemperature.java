@@ -6,8 +6,8 @@ import enums.SimulationStatus;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-public class ThermostatTemperatureGenerator extends TemperatureGenerator<Thermostat> {
-    private static final ThermostatTemperatureGenerator instance = new ThermostatTemperatureGenerator("Thermostat temperature");
+public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
+    private static final GroundFloorTemperature instance = new GroundFloorTemperature("Thermostat temperature");
     private final String name;
     private final ArrayList<Thermostat> observers = new ArrayList<>();
     private final EnumSet<SimulationStatus> possibleSimulationStatuses = EnumSet.of(
@@ -16,12 +16,12 @@ public class ThermostatTemperatureGenerator extends TemperatureGenerator<Thermos
             SimulationStatus.STANDBY);
     private Enum<SimulationStatus> simulationStatus;
 
-    public ThermostatTemperatureGenerator(String name) {
+    public GroundFloorTemperature(String name) {
         super();
         this.name = name;
     }
 
-    public static ThermostatTemperatureGenerator getInstance() {
+    public static GroundFloorTemperature getInstance() {
         return instance;
     }
 

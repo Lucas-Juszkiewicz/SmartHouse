@@ -5,15 +5,13 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
-import interfaces.ObservableDevice;
+import interfaces.SensorDevice;
+import util.GroundFloorTemperature;
 import util.TerminalColors;
-import util.ThermostatTemperatureGenerator;
 
 import java.util.*;
 
-// Should implement ObservableDevice<SmartDevice>
-public class Thermostat extends SmartDevice implements DeviceObserver {
-    //    private final DeviceType type = DeviceType.THERMOSTAT;
+public class Thermostat extends SmartDevice implements DeviceObserver, SensorDevice<Double> {
     private double airTemperature;
     private double desiredTemperature;
     private Deque<Double> temperatureHistory = new ArrayDeque<>();
@@ -36,23 +34,20 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
 
     public void showTemperatureHistory() {
         this.stopShowTemperatureHistory = false;
-            new Thread(() -> {
-                while(!stopShowTemperatureHistory) {
-                    double airTemperature1 = this.airTemperature;
-                    System.out.println("*"+airTemperature1);
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+        new Thread(() -> {
+            while (!stopShowTemperatureHistory) {
+                markTemperature(airTemperature);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-            }).start();
-        System.out.println("If you want to stop press ENTER.");
+            }
+        }).start();
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine(); // This will wait for the user to press Enter
         this.stopShowTemperatureHistory = true;
         scanner.close();
-
     }
 
     public void startTemperatureControl() {
@@ -62,8 +57,8 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     public void stopTemperatureControl() {
 
     }
-    //This method should be named 'addObserver'
-    public void connectAirConditionerOrRadiator(SmartDevice device) {
+
+    public void connect(SmartDevice device) {
         String type = null;
 
         if (device instanceof AirConditioner airConditioner) {
@@ -83,8 +78,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         }
     }
 
-    // This method should be named 'removeObserver'
-    public void disconnectAirConditionerOrRadiator(SmartDevice device) {
+    public void disconnect(SmartDevice device) {
         String type = null;
 
         if (device instanceof AirConditioner airConditioner) {
@@ -104,8 +98,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
         }
     }
 
-    // should be named 'removeObserverByLocation
-    public void disconnectDevicesByLocation(RoomType roomType, DeviceType type) {
+    public void disconnectByLocation(RoomType roomType, DeviceType type) {
         List<? extends SmartDevice> toRemove;
         String typeName = type.toString();
         String location;
@@ -144,19 +137,19 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
 
     @Override
     public void simulate() {
-        ThermostatTemperatureGenerator.getInstance().startGenerating(0.00, 40.00);
-        ThermostatTemperatureGenerator.getInstance().addObserver(this);
+        GroundFloorTemperature.getInstance().startGenerating(0.00, 40.00);
+        GroundFloorTemperature.getInstance().addObserver(this);
     }
 
     @Override
     public void stopSimulation() {
-        ThermostatTemperatureGenerator.getInstance().removeObserver(this);
-        ThermostatTemperatureGenerator.getInstance().stopGenerating();
+        GroundFloorTemperature.getInstance().removeObserver(this);
+        GroundFloorTemperature.getInstance().stopGenerating();
     }
 
     @Override
     public void updateObservedValue() {
-        this.airTemperature = ThermostatTemperatureGenerator.getInstance().getTemperature();
+        this.airTemperature = GroundFloorTemperature.getInstance().getTemperature();
         if (temperatureHistory.size() == 10) {
             temperatureHistory.removeFirst();
         }
@@ -173,17 +166,131 @@ public class Thermostat extends SmartDevice implements DeviceObserver {
     }
 
     @Override
+    public Double readValue() {
+        return Math.round(this.airTemperature * 100.0) / 100.0;
+    }
+
+    public Double readDesiredTemperature() {
+        return Math.round(this.desiredTemperature * 100.0) / 100.0;
+    }
+
+    @Override
+    public String getUnit() {
+        return "'C";
+    }
+
+    private void markTemperature(double temperature) {
+        String markedTemperatureColor;
+        if (temperature > desiredTemperature + 0.5) {
+            markedTemperatureColor = TerminalColors.ANSI_BRIGHT_RED;
+        } else if (temperature < desiredTemperature - 0.5) {
+            markedTemperatureColor = TerminalColors.ANSI_BRIGHT_BLUE;
+        } else {
+            markedTemperatureColor = TerminalColors.ANSI_BRIGHT_GREEN;
+        }
+        String desiredTemperatureF = String.format(Locale.FRANCE, "%05.2f", desiredTemperature);
+        String markedValueF = markedTemperatureColor + String.format(Locale.FRANCE, "%05.2f", temperature) + TerminalColors.ANSI_RESET;
+        StringBuilder masterZero = new StringBuilder().append(" \t|  ");
+        StringBuilder masterOne = new StringBuilder().append(" \t|  ");
+        StringBuilder masterTwo = new StringBuilder().append(" \t|  ");
+        StringBuilder masterThree = new StringBuilder().append(" \t|  ");
+        StringBuilder masterFour = new StringBuilder().append(" \t|  ");
+        for (int i = 0; i <= 40; i = i + 5) {
+            String iF = String.format(Locale.FRANCE, "%05.2f", (double) i);
+            int markedValueInt = (int) temperature;
+            String partZero = "";
+            String partOne = "";
+            String partTwo = "";
+            String partThree = "";
+            String partFive = "";
+            if (i <= markedValueInt && markedValueInt < i + 5) {
+
+                if (markedValueInt == i) {
+                    partZero = markedValueF + getUnit() + "   ";
+                    partOne = " |        ";
+                    partTwo = " | _ _ _ _";
+                    partThree = " |        ";
+                    partFive = iF + getUnit() + "   ";
+                } else if (markedValueInt == i + 1) {
+                    partZero = "  " + markedValueF + getUnit() + " ";
+                    partOne = "   |      ";
+                    partTwo = " _ | _ _ _";
+                    partThree = "   |      ";
+                    partFive = iF + getUnit() + "   ";
+                } else if (markedValueInt == i + 2) {
+                    partZero = "   " + markedValueF + getUnit();
+                    partOne = "     |    ";
+                    partTwo = " _ _ | _ _";
+                    partThree = " |        ";
+                    partFive = iF + getUnit() + "   ";
+                } else if (markedValueInt == i + 3) {
+                    partZero = "   " + markedValueF + getUnit();
+                    partOne = "       |  ";
+                    partTwo = " _ _ _ | _";
+                    partThree = " |        ";
+                    partFive = iF + getUnit() + "   ";
+                } else if (markedValueInt == i + 4) {
+                    partZero = "   " + markedValueF + getUnit();
+                    partOne = "         |";
+                    partTwo = " _ _ _ _ |";
+                    partThree = " |        ";
+                    partFive = iF + getUnit() + "   ";
+                }
+            } else {
+                partZero = "          ";
+                partOne = "          ";
+                partTwo = " _ _ _ _ _";
+                partThree = " |        ";
+                partFive = iF + getUnit() + "   ";
+            }
+            masterZero.append(partZero);
+            masterOne.append(partOne);
+            masterTwo.append(partTwo);
+            masterThree.append(partThree);
+            masterFour.append(partFive);
+        }
+        String stringMasterZero = masterZero.append("  |").toString();
+        String stringMasterOne = masterOne.append("  |").toString();
+        String stringMasterTwo = masterTwo.append("  |").toString();
+        String stringMasterThree = masterThree.append("  |").toString();
+        String stringMasterFour = masterFour.append("  |").toString();
+        System.out.println(stringMasterZero);
+        System.out.println(stringMasterOne);
+        System.out.println(stringMasterTwo);
+        System.out.println(stringMasterThree);
+        System.out.println(stringMasterFour);
+        System.out.println(
+                TerminalColors.ANSI_GRAY +
+                        "\t|\t" + TerminalColors.ANSI_BRIGHT_YELLOW + "Desired temperature = " + desiredTemperatureF + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        TerminalColors.ANSI_RESET);
+        System.out.println(
+                TerminalColors.ANSI_GRAY +
+                        "\t|\t\t\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "If you want to stop press ENTER." + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        TerminalColors.ANSI_RESET);
+        for (int i = 0; i < 2; i++) {
+            System.out.println(
+                    TerminalColors.ANSI_GRAY +
+                            " \t|                                  " +
+                            "                                                            |" +
+                            TerminalColors.ANSI_RESET);
+        }
+    }
+
+    @Override
     public String toString() {
         return TerminalColors.ANSI_YELLOW + "Thermostat \n" + TerminalColors.ANSI_RESET +
-                "airTemperature: " + TerminalColors.ANSI_YELLOW + airTemperature + TerminalColors.ANSI_RESET + "\n" +
-                "desiredTemperature: " + TerminalColors.ANSI_YELLOW + desiredTemperature + TerminalColors.ANSI_RESET + "\n" +
+                "airTemperature: " + TerminalColors.ANSI_YELLOW + readValue() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
+                "desiredTemperature: " + TerminalColors.ANSI_YELLOW + readDesiredTemperature() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
                 super.toString();
     }
 
     public String toStringNested() {
         return TerminalColors.ANSI_YELLOW + "\tThermostat \n" + TerminalColors.ANSI_RESET +
-                "\tairTemperature: " + TerminalColors.ANSI_YELLOW + airTemperature + TerminalColors.ANSI_RESET + "\n" +
-                "\tdesiredTemperature: " + TerminalColors.ANSI_YELLOW + desiredTemperature + TerminalColors.ANSI_RESET + "\n" +
+                "\tairTemperature: " + TerminalColors.ANSI_YELLOW + readValue() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
+                "\tdesiredTemperature: " + TerminalColors.ANSI_YELLOW + readDesiredTemperature() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
                 super.toStringNested();
     }
+
 }

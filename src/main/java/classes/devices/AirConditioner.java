@@ -7,8 +7,8 @@ import enums.RoomType;
 import enums.SimulationStatus;
 import interfaces.Switchable;
 import util.DeviceRegistry;
+import util.GroundFloorTemperature;
 import util.TerminalColors;
-import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
         this.connectedThermostatId = thermostatId;
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(thermostatId);
         if (thermostat.getClass() == Thermostat.class) {
-            ((Thermostat) thermostat).connectAirConditionerOrRadiator(this);
+            ((Thermostat) thermostat).connect(this);
         } else {
             DeviceType type = thermostat.getType();
             System.out.printf("AirConditioner can't be connected to the device with type %s\n", type);
@@ -67,12 +67,12 @@ public class AirConditioner extends SmartDevice implements Switchable {
 
     public void disconnectFromThermostat() {
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(this.connectedThermostatId);
-        ((Thermostat) thermostat).disconnectAirConditionerOrRadiator(this);
+        ((Thermostat) thermostat).disconnect(this);
     }
 
     public void startCooling() {
         if (isOn()) {
-            ThermostatTemperatureGenerator.getInstance().simulateCooling();
+            GroundFloorTemperature.getInstance().simulateCooling();
         } else {
             System.out.printf("AirConditioner (%s) is off\n)", this.getId());
         }
@@ -84,7 +84,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        ThermostatTemperatureGenerator.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
+        GroundFloorTemperature.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
     }
 
     @Override

@@ -8,6 +8,7 @@ public class TerminalColors {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_GRAY = "\u001B[90m";
 
     // Bright / High Intensity
     public static final String ANSI_BRIGHT_RED = "\u001B[91m";

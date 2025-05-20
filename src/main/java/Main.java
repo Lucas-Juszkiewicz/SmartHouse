@@ -22,7 +22,7 @@ public class Main {
                     DeviceStatus.OK,
                     RoomType.BASEMENT,
                     house.getId(),
-                    20.00);
+                    23.00);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -47,10 +47,10 @@ public class Main {
         thermostat.showTemperatureHistory();
         thermostat.stopSimulation();
 
-        // 'ThermostatTemperatureGenerator' this should have name like 'FirstFloorTemperature'
+        // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
         // Does Thermostat should implement SensorDevice?
         // I should take a look on...
-        //ThermostatTemperatureGenerator
+        //GroundFloorTemperature
         //Thermostat
         //TemperatureGenerator
 

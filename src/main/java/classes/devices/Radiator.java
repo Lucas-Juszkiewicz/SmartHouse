@@ -5,15 +5,16 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import enums.SimulationStatus;
+import interfaces.DeviceObserver;
 import interfaces.Switchable;
 import util.DeviceRegistry;
+import util.GroundFloorTemperature;
 import util.TerminalColors;
-import util.ThermostatTemperatureGenerator;
 
 import java.util.EnumSet;
 import java.util.UUID;
 
-public class Radiator extends SmartDevice implements Switchable {
+public class Radiator extends SmartDevice implements Switchable, DeviceObserver {
 //    private final DeviceType type = DeviceType.RADIATOR;
     private UUID connectedThermostatId;
 
@@ -54,7 +55,7 @@ public class Radiator extends SmartDevice implements Switchable {
         this.connectedThermostatId = thermostatId;
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(thermostatId);
         if(thermostat.getClass() == Thermostat.class){
-            ((Thermostat) thermostat).connectAirConditionerOrRadiator(this);
+            ((Thermostat) thermostat).connect(this);
         }else {
             DeviceType type = thermostat.getType();
             System.out.printf("Radiator can't be connected to the device with type %s\n", type);
@@ -63,17 +64,17 @@ public class Radiator extends SmartDevice implements Switchable {
 
     public void disconnectFromThermostat(){
         SmartDevice thermostat = DeviceRegistry.getInstance().getItem(this.connectedThermostatId);
-        ((Thermostat) thermostat).disconnectAirConditionerOrRadiator(this);
+        ((Thermostat) thermostat).disconnect(this);
     }
 
     public void startHeating(){
         if(isOn()){
-            ThermostatTemperatureGenerator.getInstance().simulateHeating();
+            GroundFloorTemperature.getInstance().simulateHeating();
         }
     }
 
     public void stopHeating(){
-        ThermostatTemperatureGenerator.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
+        GroundFloorTemperature.getInstance().setSimulationStatus(SimulationStatus.STANDBY);
     }
 
     @Override
@@ -98,5 +99,10 @@ public class Radiator extends SmartDevice implements Switchable {
         return TerminalColors.ANSI_YELLOW + "\tRadiator \n" + TerminalColors.ANSI_RESET +
                 "\tConnected thermostat id: " + TerminalColors.ANSI_YELLOW + connectedThermostatId + TerminalColors.ANSI_RESET + "\n" +
                 super.toStringNested();
+    }
+
+    @Override
+    public void updateObservedValue() {
+
     }
 }
