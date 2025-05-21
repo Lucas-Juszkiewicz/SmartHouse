@@ -63,12 +63,16 @@ public abstract class SmartDevice {
         return this.location;
     }
 
-    public void setStatus(DeviceStatus status) throws Exception {
+    public void setStatus(DeviceStatus status) {
         if (possibleStatuses.contains(status)) {
             this.status = status;
         } else {
             throw new IllegalArgumentException("Status " + status + " is not allowed for this device.");
         }
+    }
+
+    public EnumSet<DeviceStatus> getPossibleStatuses() {
+        return possibleStatuses;
     }
 
     public void setPossibleStatuses(EnumSet<DeviceStatus> possibleStatuses) {

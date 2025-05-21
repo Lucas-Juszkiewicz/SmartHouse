@@ -16,6 +16,7 @@ public class Main {
         Room room = new Room("Living room on the ground floor", RoomType.LIVING_ROOM, 50.00, house.getId());
         Room basement = new Room("Basement", RoomType.BASEMENT, 30.00, house.getId());
         Thermostat thermostat;
+        Radiator radiator;
         try {
             thermostat = new Thermostat(
                     "Thermo on the ground floor",
@@ -27,7 +28,6 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        Radiator radiator;
         try {
             radiator = new Radiator("Radiator1", RoomType.LIVING_ROOM, house.getId());
         } catch (Exception e) {
@@ -47,12 +47,8 @@ public class Main {
         thermostat.showTemperatureHistory();
         thermostat.stopSimulation();
 
-        // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
-        // Does Thermostat should implement SensorDevice?
-        // I should take a look on...
-        //GroundFloorTemperature
-        //Thermostat
-        //TemperatureGenerator
+        // I need to display a possibility to turn on/off AC and Radiator Thermostat - showTemperatureHistory
+        // Need to make possibility to check ac and radiator statuses - Thermostat
 
     }
 }

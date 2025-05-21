@@ -6,6 +6,7 @@ import enums.DeviceType;
 import enums.RoomType;
 import interfaces.DeviceObserver;
 import interfaces.SensorDevice;
+import interfaces.Switchable;
 import util.GroundFloorTemperature;
 import util.TerminalColors;
 
@@ -26,24 +27,36 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                 EnumSet.of(
                         DeviceStatus.NEEDS_REPAIR,
                         DeviceStatus.NEEDS_UPDATE,
-                        DeviceStatus.OK
+                        DeviceStatus.OK,
+                        DeviceStatus.COOLING,
+                        DeviceStatus.HEATING
                 )
         );
         setStatus(status);
     }
 
+    @Override
+    public void setStatus(DeviceStatus status) {
+                super.setStatus(status);
+            if (status.equals(DeviceStatus.COOLING) || status.equals(DeviceStatus.HEATING)){
+                turnOnOffConnectedDevices(radiators);
+                turnOnOffConnectedDevices(airConditioners);
+        }
+    }
+
     public void showTemperatureHistory() {
         this.stopShowTemperatureHistory = false;
-        new Thread(() -> {
+        Thread showingTemperatureHistoryThread = new Thread(() -> {
             while (!stopShowTemperatureHistory) {
-                markTemperature(airTemperature);
+                markTemperature();
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
-        }).start();
+        });
+        showingTemperatureHistoryThread.start();
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine(); // This will wait for the user to press Enter
         this.stopShowTemperatureHistory = true;
@@ -134,9 +147,26 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         }
     }
 
+    public void turnOnOffConnectedDevices(ArrayList<? extends Switchable> devices) {
+        for (Switchable switchable : devices) {
+            try {
+                if (switchable.isOn()) {
+                    switchable.turnOff();
+                }else {
+                    switchable.turnOn();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
 
     @Override
     public void simulate() {
+        for (AirConditioner airConditioner : airConditioners) {
+            airConditioner.simulate();
+        }
         GroundFloorTemperature.getInstance().startGenerating(0.00, 40.00);
         GroundFloorTemperature.getInstance().addObserver(this);
     }
@@ -179,8 +209,12 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         return "'C";
     }
 
-    private void markTemperature(double temperature) {
+    private void markTemperature() {
         String markedTemperatureColor;
+        double temperature;
+        synchronized (this) {
+            temperature = this.airTemperature;
+        }
         if (temperature > desiredTemperature + 0.5) {
             markedTemperatureColor = TerminalColors.ANSI_BRIGHT_RED;
         } else if (temperature < desiredTemperature - 0.5) {
@@ -263,6 +297,16 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                 TerminalColors.ANSI_GRAY +
                         "\t|\t" + TerminalColors.ANSI_BRIGHT_YELLOW + "Desired temperature = " + desiredTemperatureF + TerminalColors.ANSI_RESET +
                         "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        TerminalColors.ANSI_RESET);
+        System.out.println(
+                TerminalColors.ANSI_GRAY +
+                        "\t|\t\t\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "Press A to turn " +"airconditioner.Status" + " AC." + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        TerminalColors.ANSI_RESET);
+        System.out.println(
+                TerminalColors.ANSI_GRAY +
+                        "\t|\t\t\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "Press R to turn " +"radiator.Status" + "radiators." + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
                         TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +

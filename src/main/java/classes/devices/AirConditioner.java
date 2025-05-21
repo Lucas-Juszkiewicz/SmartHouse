@@ -46,6 +46,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
 
     @Override
     public void turnOff() throws Exception {
+        stopCooling();
         this.setStatus(DeviceStatus.OFF);
     }
 
@@ -89,7 +90,6 @@ public class AirConditioner extends SmartDevice implements Switchable {
 
     @Override
     public void simulate() {
-        Set<Thermostat> thermostats = DeviceRegistry.getInstance().getItemByClass(Thermostat.class);
     }
 
     @Override

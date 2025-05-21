@@ -1,6 +1,7 @@
 package util;
 
 import classes.devices.Thermostat;
+import enums.DeviceStatus;
 import enums.SimulationStatus;
 
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
             SimulationStatus.HEATING,
             SimulationStatus.COOLING,
             SimulationStatus.STANDBY);
-    private Enum<SimulationStatus> simulationStatus;
+    private volatile Enum<SimulationStatus> simulationStatus;
+    private Thread coolingThread;
+    private Thread heatingThread;
 
     public GroundFloorTemperature(String name) {
         super();
@@ -30,7 +33,11 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
     }
 
     public void setSimulationStatus(Enum<SimulationStatus> simulationStatus) {
-        this.simulationStatus = simulationStatus;
+        if (possibleSimulationStatuses.contains(simulationStatus)) {
+            this.simulationStatus = simulationStatus;
+        }else {
+            System.out.println("Temperature simulation status could not be set");
+        }
     }
 
     @Override
@@ -56,29 +63,47 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
 
     public void simulateCooling() {
         this.setSimulationStatus(SimulationStatus.COOLING);
-        new Thread(() -> {
+        for (Thermostat observer : observers) {
+            try {
+                observer.setStatus(DeviceStatus.COOLING);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        coolingThread = new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.COOLING)) {
-                this.setTemperature(this.getTemperature() - 0.5);
+                this.setTemperature(this.getTemperature() - 0.3);
+                System.out.println("GFT " + this.getSimulationStatus() + " " + this.getTemperature());
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
         });
+        coolingThread.start();
     }
 
     public void simulateHeating() {
         this.setSimulationStatus(SimulationStatus.HEATING);
-        new Thread(() -> {
+        for (Thermostat observer : observers) {
+            try {
+                observer.setStatus(DeviceStatus.HEATING);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        heatingThread = new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.HEATING)) {
-                this.setTemperature(this.getTemperature() + 0.5);
+                this.setTemperature(this.getTemperature() + 0.3);
+                System.out.println("GFT " + this.getSimulationStatus() + " " + this.getTemperature());
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
         });
+        heatingThread.start();
     }
 }

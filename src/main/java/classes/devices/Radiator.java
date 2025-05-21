@@ -43,6 +43,7 @@ public class Radiator extends SmartDevice implements Switchable, DeviceObserver 
 
     @Override
     public void turnOff() throws Exception{
+        stopHeating();
         this.setStatus(DeviceStatus.OFF);
     }
 
