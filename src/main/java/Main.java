@@ -44,8 +44,9 @@ public class Main {
         airConditioner.connectToThermostat(thermostat.getId());
         thermostat.simulate();
         System.out.println(house);
-        thermostat.showTemperatureHistory();
-        thermostat.stopSimulation();
+        thermostat.inputLoop();
+//        thermostat.showTemperatureHistory();
+//        thermostat.stopSimulation();
 
         // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
         // Does Thermostat should implement SensorDevice?

@@ -15,6 +15,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
             SimulationStatus.COOLING,
             SimulationStatus.STANDBY);
     private Enum<SimulationStatus> simulationStatus;
+    private final Object statusLock = new Object();
 
     public GroundFloorTemperature(String name) {
         super();
@@ -26,11 +27,15 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
     }
 
     public Enum<SimulationStatus> getSimulationStatus() {
-        return simulationStatus;
+        synchronized (statusLock) {
+            return simulationStatus;
+        }
     }
 
     public void setSimulationStatus(Enum<SimulationStatus> simulationStatus) {
+        synchronized (statusLock) {
         this.simulationStatus = simulationStatus;
+        }
     }
 
     @Override
@@ -65,7 +70,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
                     Thread.currentThread().interrupt();
                 }
             }
-        });
+        }).start();
     }
 
     public void simulateHeating() {
@@ -79,6 +84,6 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
                     Thread.currentThread().interrupt();
                 }
             }
-        });
+        }).start();
     }
 }
