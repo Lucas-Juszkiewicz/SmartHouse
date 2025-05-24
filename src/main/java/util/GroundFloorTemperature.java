@@ -63,7 +63,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
         this.setSimulationStatus(SimulationStatus.COOLING);
         new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.COOLING)) {
-                this.setTemperature(this.getTemperature() - 0.5);
+                this.setTemperature(this.getTemperature() - 0.25);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -77,7 +77,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
         this.setSimulationStatus(SimulationStatus.HEATING);
         new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.HEATING)) {
-                this.setTemperature(this.getTemperature() + 0.5);
+                this.setTemperature(this.getTemperature() + 0.25);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {

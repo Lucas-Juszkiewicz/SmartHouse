@@ -18,13 +18,16 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
     private double airTemperature;
     private double desiredTemperature;
     private Deque<Double> temperatureHistory = new ArrayDeque<>();
-    private boolean stopShowTemperatureHistory = false;
+    private volatile boolean stopShowTemperatureHistory = false;
     private final ArrayList<AirConditioner> airConditioners = new ArrayList<>();
     private final ArrayList<Radiator> radiators = new ArrayList<>();
     private final Object desiredTemperatureLock = new Object();
     private final Object airTemperatureLock = new Object();
+    private final Object pauseLock = new Object();
+    private boolean pause = false;
+    private final Scanner scanner;
 
-    public Thermostat(String name, DeviceStatus status, RoomType roomType, UUID houseId, Double desiredTemperature) throws Exception {
+    public Thermostat(String name, DeviceStatus status, RoomType roomType, UUID houseId, Double desiredTemperature, Scanner scanner) throws Exception {
         super(name, DeviceType.THERMOSTAT, roomType, houseId);
         this.desiredTemperature = desiredTemperature;
         setPossibleStatuses(
@@ -35,11 +38,12 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                 )
         );
         setStatus(status);
+        this.scanner = scanner;
     }
 
     public double getAirTemperature() {
-        synchronized (airTemperatureLock){
-        return airTemperature;
+        synchronized (airTemperatureLock) {
+            return airTemperature;
         }
     }
 
@@ -61,39 +65,68 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         }
     }
 
-    public void inputLoop(){
-        Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
+    public void inputLoop() {
+        while (!stopShowTemperatureHistory) {
+            String input = scanner.nextLine();
 //            if (!scanner.hasNextLine()) {
 //                System.out.println("No more input. Stopping input thread.");
 //                scanner.close();
 //            }
-            if(input.matches("[Dd]")){
+            if (input.matches("[Dd]")) {
+                pause = true;
                 System.out.println("Type a value from 00,00 to 40,00 and press ENTER:\n");
                 String valueInput = scanner.nextLine().replace(',', '.');
                 double value = Double.parseDouble(valueInput);
                 setDesiredTemperature(value);
-            } else if(input.matches("[Ee]")){
+                pause = false;
+                synchronized (pauseLock) {
+                pauseLock.notifyAll();
+                }
+            } else if (input.matches("[Ee]")) {
                 this.stopShowTemperatureHistory = true;
             }
-        scanner.close();
+        }
+    }
+
+    public void showTemperatureHistoryLoop() {
+        while (!stopShowTemperatureHistory) {
+            while (pause) {
+                synchronized (pauseLock) {
+                    try {
+                        pauseLock.wait();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            markTemperature(getAirTemperature());
+            try {
+                Thread.sleep(5000L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     public void showTemperatureHistory() {
         this.stopShowTemperatureHistory = false;
+        Thread inputLoopThread = new Thread(this::inputLoop);
+        inputLoopThread.start();
         Thread showTemperatureThread = new Thread(() -> {
-            while (!stopShowTemperatureHistory) {
-                markTemperature(getAirTemperature());
-                inputLoop();
-                try {
-                    Thread.sleep(5000L);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
+            synchronized (pauseLock) {
+                showTemperatureHistoryLoop();
             }
-
+            Thread.currentThread().interrupt();
+            inputLoopThread.interrupt();
         });
+
         showTemperatureThread.start();
+        try {
+            inputLoopThread.join();
+            showTemperatureThread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void startTemperatureControl() {
@@ -201,9 +234,9 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         }
         temperatureHistory.addLast(getAirTemperature());
 
-        if (getAirTemperature() + 1.00 > desiredTemperature) {
+        if (getAirTemperature() + 00.50 > desiredTemperature) {
             airConditioners.forEach(AirConditioner::startCooling);
-        } else if (getAirTemperature() - 1.00 < desiredTemperature) {
+        } else if (getAirTemperature() - 00.50 < desiredTemperature) {
             radiators.forEach(Radiator::startHeating);
         } else {
             airConditioners.forEach(AirConditioner::stopCooling);
@@ -318,19 +351,16 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                         TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +
-                        "\t|\t" + TerminalColors.ANSI_RESET + "To change " + TerminalColors.ANSI_BRIGHT_YELLOW + "Desired temperature " + TerminalColors.ANSI_RESET + "enter a value from 00,00 to 40,00" +
-                        "\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        "\t|\t" + TerminalColors.ANSI_RESET + "To change " + TerminalColors.ANSI_BRIGHT_YELLOW + "Desired temperature " + TerminalColors.ANSI_RESET
+                        + "type "+ TerminalColors.ANSI_GREEN
+                        +"D" + TerminalColors.ANSI_RESET+ " and press " +TerminalColors.ANSI_GREEN+ " ENTER" + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
                         TerminalColors.ANSI_RESET);
-        System.out.println(
-                TerminalColors.ANSI_GRAY +
-                        "\t|\t" + TerminalColors.ANSI_RESET + "and press ENTER" +
-                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
-                        TerminalColors.ANSI_RESET);
-        System.out.println(
-                TerminalColors.ANSI_GRAY +
-                        "\t|\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "If you want to stop press E and than ENTER." + TerminalColors.ANSI_RESET +
-                        "\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
-                        TerminalColors.ANSI_RESET);
+//        System.out.println(
+//                TerminalColors.ANSI_GRAY +
+//                        "\t|\t" + TerminalColors.ANSI_RESET + "and press " +TerminalColors.ANSI_GREEN+ " ENTER" + TerminalColors.ANSI_RESET +
+//                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+//                        TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +
                         " \t|                                  " +
@@ -338,16 +368,15 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                         TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +
+                        "\t|\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "If you want to stop press " +TerminalColors.ANSI_GREEN+ "E"
+                        +TerminalColors.ANSI_YELLOW+ " and then " +TerminalColors.ANSI_GREEN+ " ENTER." + TerminalColors.ANSI_RESET +
+                        "\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
+                        TerminalColors.ANSI_RESET);
+        System.out.println(
+                TerminalColors.ANSI_GRAY +
                         " \t|__________________________________" +
                         "____________________________________________________________|" +
                         TerminalColors.ANSI_RESET);
-//        for (int i = 0; i < 2; i++) {
-//            System.out.println(
-//                    TerminalColors.ANSI_GRAY +
-//                            " \t|                                  " +
-//                            "                                                            |" +
-//                            TerminalColors.ANSI_RESET);
-//        }
     }
 
     private String getTime() {

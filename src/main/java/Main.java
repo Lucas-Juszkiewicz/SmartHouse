@@ -8,10 +8,12 @@ import enums.RoomType;
 import util.Coordinates;
 
 import java.sql.SQLOutput;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
         House house = new House("Castle in Scotland", new Coordinates(52.01, 24.32));
         Room room = new Room("Living room on the ground floor", RoomType.LIVING_ROOM, 50.00, house.getId());
         Room basement = new Room("Basement", RoomType.BASEMENT, 30.00, house.getId());
@@ -22,7 +24,8 @@ public class Main {
                     DeviceStatus.OK,
                     RoomType.BASEMENT,
                     house.getId(),
-                    23.00);
+                    23.00,
+                    scanner);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -44,8 +47,8 @@ public class Main {
         airConditioner.connectToThermostat(thermostat.getId());
         thermostat.simulate();
         System.out.println(house);
-        thermostat.inputLoop();
-//        thermostat.showTemperatureHistory();
+//        thermostat.inputLoop();
+        thermostat.showTemperatureHistory();
 //        thermostat.stopSimulation();
 
         // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
@@ -54,6 +57,6 @@ public class Main {
         //GroundFloorTemperature
         //Thermostat
         //TemperatureGenerator
-
+        scanner.close();
     }
 }

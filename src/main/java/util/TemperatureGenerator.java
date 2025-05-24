@@ -43,13 +43,13 @@ public abstract class TemperatureGenerator<T extends SmartDevice> implements Obs
         this.temperature = minTemperature + ((maxTemperature - minTemperature) / 2); // starter value
         while (isGenerating) {
             double plusMinusOrNoChange = 0.1 + Math.random() * (3.00 - 0.1);
-            double oneTempStep = 0.1 + Math.random() * (0.50 - 0.1);
-            if (plusMinusOrNoChange > 1.6) {
+            double oneTempStep = 0.1 + Math.random() * (0.20 - 0.1);
+            if (plusMinusOrNoChange > 1.5) {
                 synchronized (temperatureLock) {
                     temperature = Math.min(temperature + oneTempStep, maxTemperature);
                 }
                 notifyObservers();
-            } else if (plusMinusOrNoChange < 1.3) {
+            } else if (plusMinusOrNoChange <= 1.2) {
                 synchronized (temperatureLock) {
                     temperature = Math.max(temperature - oneTempStep, minTemperature);
                 }
