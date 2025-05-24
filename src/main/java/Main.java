@@ -1,9 +1,11 @@
 import classes.House;
 import classes.Room;
 import classes.devices.AirConditioner;
+import classes.devices.Outlet;
 import classes.devices.Radiator;
 import classes.devices.Thermostat;
 import enums.DeviceStatus;
+import enums.DeviceType;
 import enums.RoomType;
 import util.Coordinates;
 
@@ -39,8 +41,10 @@ public class Main {
 
         radiator.connectToThermostat(thermostat.getId());
         AirConditioner airConditioner;
+        Outlet outlet;
         try {
             airConditioner = new AirConditioner("AC1", DeviceStatus.ON, RoomType.LIVING_ROOM, house.getId());
+            outlet = new Outlet("O1", DeviceType.OUTLET, RoomType.LIVING_ROOM, house.getId(), scanner);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -48,15 +52,18 @@ public class Main {
         thermostat.simulate();
         System.out.println(house);
 //        thermostat.inputLoop();
-        thermostat.showTemperatureHistory();
+//        thermostat.showTemperatureHistory();
+
+        outlet.simulate();
+        outlet.showPowerConsumptionHistory();
 //        thermostat.stopSimulation();
 
-        // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
-        // Does Thermostat should implement SensorDevice?
-        // I should take a look on...
-        //GroundFloorTemperature
-        //Thermostat
-        //TemperatureGenerator
-        scanner.close();
+                // 'GroundFloorTemperature' this should have name like 'GroundFloorTemperature'
+                // Does Thermostat should implement SensorDevice?
+                // I should take a look on...
+                //GroundFloorTemperature
+                //Thermostat
+                //ValueGenerator
+                        scanner.close();
     }
 }

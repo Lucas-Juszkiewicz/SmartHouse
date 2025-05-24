@@ -24,5 +24,6 @@ public enum DeviceType {
     GARAGE_DOOR_OPENER,
     THERMOMETER,
     AIR_CONDITIONER,
-    RADIATOR
+    RADIATOR,
+    OUTLET
 }

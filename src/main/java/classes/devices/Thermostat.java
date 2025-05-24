@@ -12,7 +12,6 @@ import util.TerminalColors;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Thermostat extends SmartDevice implements DeviceObserver, SensorDevice<Double> {
     private double airTemperature;
@@ -216,7 +215,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
 
     @Override
     public void simulate() {
-        GroundFloorTemperature.getInstance().startGenerating(0.00, 40.00);
+        GroundFloorTemperature.getInstance().startGenerating(0.00, 40.00, 0.1, 0.2);
         GroundFloorTemperature.getInstance().addObserver(this);
     }
 
@@ -228,7 +227,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
 
     @Override
     public void updateObservedValue() {
-        setAirTemperature(GroundFloorTemperature.getInstance().getTemperature());
+        setAirTemperature(GroundFloorTemperature.getInstance().getValue());
         if (temperatureHistory.size() == 10) {
             temperatureHistory.removeFirst();
         }
@@ -356,11 +355,6 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                         +"D" + TerminalColors.ANSI_RESET+ " and press " +TerminalColors.ANSI_GREEN+ " ENTER" + TerminalColors.ANSI_RESET +
                         "\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
                         TerminalColors.ANSI_RESET);
-//        System.out.println(
-//                TerminalColors.ANSI_GRAY +
-//                        "\t|\t" + TerminalColors.ANSI_RESET + "and press " +TerminalColors.ANSI_GREEN+ " ENTER" + TerminalColors.ANSI_RESET +
-//                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
-//                        TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +
                         " \t|                                  " +

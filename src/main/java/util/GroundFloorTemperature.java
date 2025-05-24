@@ -6,7 +6,7 @@ import enums.SimulationStatus;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
-public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
+public class GroundFloorTemperature extends ValueGenerator<Thermostat> {
     private static final GroundFloorTemperature instance = new GroundFloorTemperature("Thermostat temperature");
     private final String name;
     private final ArrayList<Thermostat> observers = new ArrayList<>();
@@ -63,7 +63,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
         this.setSimulationStatus(SimulationStatus.COOLING);
         new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.COOLING)) {
-                this.setTemperature(this.getTemperature() - 0.25);
+                this.setValue(this.getValue() - 0.25);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -77,7 +77,7 @@ public class GroundFloorTemperature extends TemperatureGenerator<Thermostat> {
         this.setSimulationStatus(SimulationStatus.HEATING);
         new Thread(() -> {
             while (getSimulationStatus().equals(SimulationStatus.HEATING)) {
-                this.setTemperature(this.getTemperature() + 0.25);
+                this.setValue(this.getValue() + 0.25);
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
