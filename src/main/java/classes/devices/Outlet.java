@@ -7,11 +7,8 @@ import enums.RoomType;
 import interfaces.DeviceObserver;
 import interfaces.SensorDevice;
 import interfaces.Switchable;
-import util.GroundFloorTemperature;
 import util.PowerConsumption;
 import util.TerminalColors;
-
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -23,7 +20,6 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
     private final Object powerConsumptionLock = new Object();
     private volatile boolean stopShowPowerConsumptionHistory = false;
     private final Scanner scanner;
-//    private final Object powerConsumptionHistoryLock = new Object();
 
     public Outlet(String name, DeviceType type, RoomType roomType, UUID houseId, Scanner scanner) throws Exception {
         super(name, type, roomType, houseId);
@@ -137,7 +133,6 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
                 if (rowIndex < 0) rowIndex = 0;
                 if (rowIndex > 9) rowIndex = 9;
 
-                // Define cell contents
                 String cell = "===";
                 String cellFormatted = String.format("%" + COL_WIDTH + "s", cell);
                 if (record[0].equals(getPowerConsumptionHistory().getLast()[0]) || recordCounter == 10) {
@@ -146,7 +141,6 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
 
                 String empty = String.format("%" + COL_WIDTH + "s", "");
 
-                // Append one 'O' per column in correct row
                 rowA.append(rowIndex == 0 ? cellFormatted : empty);
                 rowB.append(rowIndex == 1 ? cellFormatted : empty);
                 rowC.append(rowIndex == 2 ? cellFormatted : empty);
@@ -158,7 +152,6 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
                 rowI.append(rowIndex == 8 ? cellFormatted : empty);
                 rowJ.append(rowIndex == 9 ? cellFormatted : empty);
 
-                // Time labels
                 rowK.append(String.format("%" + COL_WIDTH + "s", "_____"));
                 rowL.append(String.format("%" + COL_WIDTH + "s", splitTime[0] + "h"));
                 rowM.append(String.format("%" + COL_WIDTH + "s", splitTime[1] + "m"));
@@ -171,90 +164,6 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
         System.out.print(rowN);
     }
 
-
-//    private void printPowerConsumptionHistoryAsterisk() {
-//        StringBuilder top = new StringBuilder();
-//        top.append("\n\n \t      | PowerConsumption (Watt)");
-//        StringBuilder rowA = new StringBuilder(" \t 4000 | ");
-//        StringBuilder rowB = new StringBuilder(" \t 3600 | ");
-//        StringBuilder rowC = new StringBuilder(" \t 3200 | ");
-//        StringBuilder rowD = new StringBuilder(" \t 2800 | ");
-//        StringBuilder rowE = new StringBuilder(" \t 2400 | ");
-//        StringBuilder rowF = new StringBuilder(" \t 2000 | ");
-//        StringBuilder rowG = new StringBuilder(" \t 1600 | ");
-//        StringBuilder rowH = new StringBuilder(" \t 1200 | ");
-//        StringBuilder rowI = new StringBuilder(" \t  800 | ");
-//        StringBuilder rowJ = new StringBuilder(" \t  400 | ");
-//        StringBuilder rowK = new StringBuilder(" \t   T  | ");
-//        StringBuilder rowL = new StringBuilder(" \t   I  | ");
-//        StringBuilder rowM = new StringBuilder(" \t   M  | ");
-//        StringBuilder rowN = new StringBuilder(" \t   E  | ");
-//
-
-    /// /        String[][] powerArray = getPowerConsumptionHistory().toArray(new String[0][]);
-    /// /        String latestPower = powerArray.getLast()[0];
-//
-//        for (String[] record : getPowerConsumptionHistory()) {
-//            if (record != null && record.length > 1) {
-//                int power = Integer.parseInt(record[0]);
-//                String time = record[1];
-//                String[] splitTime = time.split(":");
-//
-//                int row = 10 - power / 400;
-//                if (row < 0) row = 0;
-//                if (row > 9) row = 9;
-//
-//                String cell = "  O  ";
-//                if (String.valueOf(power).equals(getPowerConsumptionHistory().getLast()[0])) {
-//                    cell = String.format("%2sO%2s", getColor(power), TerminalColors.ANSI_RESET);
-//                }
-//
-//                // Append to correct row
-//                switch (row) {
-//                    case 0:
-//                        rowA.append(cell);
-//                        break;
-//                    case 1:
-//                        rowB.append(cell);
-//                        break;
-//                    case 2:
-//                        rowC.append(cell);
-//                        break;
-//                    case 3:
-//                        rowD.append(cell);
-//                        break;
-//                    case 4:
-//                        rowE.append(cell);
-//                        break;
-//                    case 5:
-//                        rowF.append(cell);
-//                        break;
-//                    case 6:
-//                        rowG.append(cell);
-//                        break;
-//                    case 7:
-//                        rowH.append(cell);
-//                        break;
-//                    case 8:
-//                        rowI.append(cell);
-//                        break;
-//                    case 9:
-//                        rowJ.append(cell);
-//                        break;
-//                }
-//
-//                // Append time info
-//                rowK.append("_____");
-//                rowL.append(String.format("%5s", splitTime[0] + "h"));
-//                rowM.append(String.format("%5s", splitTime[1] + "m"));
-//                rowN.append(String.format("%5s", splitTime[2] + "s"));
-//            }
-//        }
-//
-//        print(top, rowA, rowB, rowC, rowD, rowE, rowF);
-//        print(rowG, rowH, rowI, rowJ, rowK, rowL, rowM);
-//        System.out.print(rowN);
-//    }
     private String getColor(int power) {
         String markedPowerConsumptionColor;
         if (power > 3600) {
