@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class AirConditioner extends SmartDevice implements Switchable {
-//    private final DeviceType type = DeviceType.AIR_CONDITIONER;
     private UUID connectedThermostatId;
 
     public AirConditioner(String name, DeviceStatus status, RoomType roomType, UUID houseId) throws Exception {
@@ -23,6 +22,7 @@ public class AirConditioner extends SmartDevice implements Switchable {
         this.setPossibleStatuses(EnumSet.of(
                 DeviceStatus.ON,
                 DeviceStatus.OFF,
+                DeviceStatus.OK,
                 DeviceStatus.STANDBY,
                 DeviceStatus.NEEDS_REPAIR,
                 DeviceStatus.NEEDS_CLEANING));

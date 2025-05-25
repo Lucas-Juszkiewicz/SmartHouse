@@ -14,8 +14,7 @@ import util.TerminalColors;
 import java.util.EnumSet;
 import java.util.UUID;
 
-public class Radiator extends SmartDevice implements Switchable, DeviceObserver {
-//    private final DeviceType type = DeviceType.RADIATOR;
+public class Radiator extends SmartDevice implements Switchable {
     private UUID connectedThermostatId;
 
     public Radiator(String name, RoomType roomType, UUID houseId) throws Exception {
@@ -101,8 +100,4 @@ public class Radiator extends SmartDevice implements Switchable, DeviceObserver 
                 super.toStringNested();
     }
 
-    @Override
-    public void updateObservedValue() {
-
-    }
 }

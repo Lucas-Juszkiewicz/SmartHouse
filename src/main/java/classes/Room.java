@@ -54,7 +54,7 @@ public class Room {
 
     @Override
     public String toString() {
-        return TerminalColors.ANSI_BRIGHT_YELLOW + "Room\n" + TerminalColors.ANSI_RESET +
+        return TerminalColors.ANSI_BRIGHT_YELLOW + "\nRoom\n" + TerminalColors.ANSI_RESET +
                 "in '" + houseName + "'\n" +
                 "name: " + name + "\n" +
                 "type: " + type + "\n" +

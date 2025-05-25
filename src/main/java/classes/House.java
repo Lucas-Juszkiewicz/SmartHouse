@@ -59,11 +59,11 @@ public class House {
         rooms.forEach(room -> {
             nestedRooms.append(room.toStringNested()).append("\n");
         });
-        return TerminalColors.ANSI_BRIGHT_YELLOW + "House\n" + TerminalColors.ANSI_RESET +
+        return "\n"+TerminalColors.ANSI_BRIGHT_YELLOW + "House\n" + TerminalColors.ANSI_RESET +
                 "id: " + id + "\n" +
                 "name: " + name + "\n" +
                 "coordinates: " + coordinates + "\n" +
                 "area: " + area + "m^2" + "\n" +
-                "rooms:\n" + nestedRooms;
+                "rooms:\n" + (rooms.isEmpty() ? " NO ROOMS" : nestedRooms.toString()) + "\n";
     }
 }

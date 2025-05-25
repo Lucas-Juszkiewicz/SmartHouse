@@ -25,5 +25,5 @@ public enum DeviceType {
     THERMOMETER,
     AIR_CONDITIONER,
     RADIATOR,
-    OUTLET
+    TEMPERATURE_SENSOR, OUTLET
 }

@@ -35,7 +35,7 @@ public abstract class SmartDevice {
         this.houseId = houseId;
         this.roomType = roomType;
         setLocation(roomType, houseId);
-        System.out.println(DeviceRegistry.getInstance().addItem(id, this)); // it adds device to the DeviceRegistry
+        DeviceRegistry.getInstance().addItem(id, this); // it adds device to the DeviceRegistry
     }
 
 

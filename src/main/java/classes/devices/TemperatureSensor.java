@@ -8,6 +8,7 @@ import interfaces.DeviceObserver;
 import interfaces.SensorDevice;
 import util.GroundFloorTemperature;
 import util.OutsideTemperature;
+import util.TerminalColors;
 
 import java.util.EnumSet;
 import java.util.UUID;
@@ -66,5 +67,18 @@ public class TemperatureSensor extends SmartDevice implements SensorDevice<Strin
     @Override
     public void updateObservedValue() {
         setTemperature(OutsideTemperature.getInstance().getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "\n" + TerminalColors.ANSI_YELLOW + "Temperature sensor \n" + TerminalColors.ANSI_RESET +
+                "Temperature: " + TerminalColors.ANSI_YELLOW + readValue() + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tTemperature sensor \n" + TerminalColors.ANSI_RESET +
+                "\tTemperature: " + TerminalColors.ANSI_YELLOW + readValue() + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
     }
 }

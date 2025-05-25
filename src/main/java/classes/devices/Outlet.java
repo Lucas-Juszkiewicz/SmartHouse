@@ -248,5 +248,18 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
         return "W";
     }
 
+    @Override
+    public String toString() {
+        return "\n" + TerminalColors.ANSI_YELLOW + "Outlet \n" + TerminalColors.ANSI_RESET +
+                "Is in use: " + TerminalColors.ANSI_YELLOW + isInUse + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tOutlet \n" + TerminalColors.ANSI_RESET +
+                "\tIs in use: " + TerminalColors.ANSI_YELLOW + isInUse + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
+    }
+
 
 }

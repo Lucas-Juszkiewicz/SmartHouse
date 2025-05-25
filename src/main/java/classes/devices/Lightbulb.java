@@ -5,6 +5,7 @@ import enums.DeviceStatus;
 import enums.DeviceType;
 import enums.RoomType;
 import interfaces.Switchable;
+import util.TerminalColors;
 
 import java.util.EnumSet;
 import java.util.UUID;
@@ -94,5 +95,22 @@ public class Lightbulb extends SmartDevice implements Switchable {
     @Override
     public boolean isOn() {
         return getStatus() == DeviceStatus.ON;
+    }
+
+    @Override
+    public String toString() {
+        return "\n" + TerminalColors.ANSI_YELLOW + "Light bulb \n" + TerminalColors.ANSI_RESET +
+                "Hue: " + TerminalColors.ANSI_YELLOW + hue + TerminalColors.ANSI_RESET + "\n" +
+                "Saturation: " + TerminalColors.ANSI_YELLOW + saturation + TerminalColors.ANSI_RESET + "\n" +
+                "Value: " + TerminalColors.ANSI_YELLOW + value + TerminalColors.ANSI_RESET + "\n" +
+                super.toString();
+    }
+
+    public String toStringNested() {
+        return TerminalColors.ANSI_YELLOW + "\tLight bulb \n" + TerminalColors.ANSI_RESET +
+                "\tHue: " + TerminalColors.ANSI_YELLOW + hue + TerminalColors.ANSI_RESET + "\n" +
+                "\tSaturation: " + TerminalColors.ANSI_YELLOW + saturation + TerminalColors.ANSI_RESET + "\n" +
+                "\tValue: " + TerminalColors.ANSI_YELLOW + value + TerminalColors.ANSI_RESET + "\n" +
+                super.toStringNested();
     }
 }

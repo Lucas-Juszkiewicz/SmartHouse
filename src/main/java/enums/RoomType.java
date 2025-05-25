@@ -10,5 +10,6 @@ public enum RoomType {
     ATTIC,
     LIBRARY,
     SWIMMING_POOL,
+    GARDEN,
     OTHER
 }

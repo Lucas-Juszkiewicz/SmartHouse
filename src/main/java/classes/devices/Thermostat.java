@@ -67,10 +67,6 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
     public void inputLoop() {
         while (!stopShowTemperatureHistory) {
             String input = scanner.nextLine();
-//            if (!scanner.hasNextLine()) {
-//                System.out.println("No more input. Stopping input thread.");
-//                scanner.close();
-//            }
             if (input.matches("[Dd]")) {
                 pause = true;
                 System.out.println("Type a value from 00,00 to 40,00 and press ENTER:\n");
@@ -79,7 +75,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                 setDesiredTemperature(value);
                 pause = false;
                 synchronized (pauseLock) {
-                pauseLock.notifyAll();
+                    pauseLock.notifyAll();
                 }
             } else if (input.matches("[Ee]")) {
                 this.stopShowTemperatureHistory = true;
@@ -126,14 +122,6 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void startTemperatureControl() {
-
-    }
-
-    public void stopTemperatureControl() {
-
     }
 
     public void connect(SmartDevice device) {
@@ -351,8 +339,8 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
         System.out.println(
                 TerminalColors.ANSI_GRAY +
                         "\t|\t" + TerminalColors.ANSI_RESET + "To change " + TerminalColors.ANSI_BRIGHT_YELLOW + "Desired temperature " + TerminalColors.ANSI_RESET
-                        + "type "+ TerminalColors.ANSI_GREEN
-                        +"D" + TerminalColors.ANSI_RESET+ " and press " +TerminalColors.ANSI_GREEN+ " ENTER" + TerminalColors.ANSI_RESET +
+                        + "type " + TerminalColors.ANSI_GREEN
+                        + "D" + TerminalColors.ANSI_RESET + " and press " + TerminalColors.ANSI_GREEN + " ENTER" + TerminalColors.ANSI_RESET +
                         "\t\t\t\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
                         TerminalColors.ANSI_RESET);
         System.out.println(
@@ -362,8 +350,8 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
                         TerminalColors.ANSI_RESET);
         System.out.println(
                 TerminalColors.ANSI_GRAY +
-                        "\t|\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "If you want to stop press " +TerminalColors.ANSI_GREEN+ "E"
-                        +TerminalColors.ANSI_YELLOW+ " and then " +TerminalColors.ANSI_GREEN+ " ENTER." + TerminalColors.ANSI_RESET +
+                        "\t|\t\t\t\t\t\t" + TerminalColors.ANSI_YELLOW + "If you want to stop press " + TerminalColors.ANSI_GREEN + "E"
+                        + TerminalColors.ANSI_YELLOW + " and then " + TerminalColors.ANSI_GREEN + " ENTER." + TerminalColors.ANSI_RESET +
                         "\t\t\t\t\t\t   " + TerminalColors.ANSI_GRAY + "|" +
                         TerminalColors.ANSI_RESET);
         System.out.println(
@@ -381,7 +369,7 @@ public class Thermostat extends SmartDevice implements DeviceObserver, SensorDev
 
     @Override
     public String toString() {
-        return TerminalColors.ANSI_YELLOW + "Thermostat \n" + TerminalColors.ANSI_RESET +
+        return "\n" + TerminalColors.ANSI_YELLOW + "Thermostat \n" + TerminalColors.ANSI_RESET +
                 "airTemperature: " + TerminalColors.ANSI_YELLOW + readValue() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
                 "desiredTemperature: " + TerminalColors.ANSI_YELLOW + readDesiredTemperature() + getUnit() + TerminalColors.ANSI_RESET + "\n" +
                 super.toString();
