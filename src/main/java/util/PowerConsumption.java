@@ -21,13 +21,13 @@ public class PowerConsumption extends ValueGenerator<Outlet> {
     @Override
     public void addObserver(Outlet observer) {
         observers.add(observer);
-        System.out.printf("%s\n (%s) has been added to the %ss observers list", observer.getName(), observer.getId(), this.name);
+//        System.out.printf("%s\n (%s) has been added to the %ss observers list", observer.getName(), observer.getId(), this.name);
     }
 
     @Override
     public void removeObserver(Outlet observer) {
         observers.remove(observer);
-        System.out.printf("%s\n (%s) has been removed from the %ss observers list.", observer.getName(), observer.getId(), name);
+//        System.out.printf("%s\n (%s) has been removed from the %ss observers list.", observer.getName(), observer.getId(), name);
     }
 
     @Override

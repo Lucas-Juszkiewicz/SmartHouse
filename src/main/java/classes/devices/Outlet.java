@@ -23,6 +23,7 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
     private final Object powerConsumptionLock = new Object();
     private volatile boolean stopShowPowerConsumptionHistory = false;
     private final Scanner scanner;
+//    private final Object powerConsumptionHistoryLock = new Object();
 
     public Outlet(String name, DeviceType type, RoomType roomType, UUID houseId, Scanner scanner) throws Exception {
         super(name, type, roomType, houseId);
@@ -57,6 +58,19 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
         }
     }
 
+    public Deque<String[]> getPowerConsumptionHistory() {
+        synchronized (powerConsumptionLock) {
+            return powerConsumptionHistory;
+        }
+    }
+
+    public void setPowerConsumptionHistory(Deque<String[]> updated) {
+        synchronized (powerConsumptionLock) {
+            this.powerConsumptionHistory = updated;
+        }
+    }
+
+
     public void showPowerConsumptionHistoryLoop() {
         while (!stopShowPowerConsumptionHistory) {
             printPowerConsumptionHistoryAsterisk();
@@ -82,8 +96,8 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
             inputThread.interrupt();
             Thread.currentThread().interrupt();
         });
-        showPowerConsumptionThread.start();
         inputThread.start();
+        showPowerConsumptionThread.start();
         try {
             showPowerConsumptionThread.join();
             inputThread.join();
@@ -92,73 +106,189 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
         }
     }
 
-    private void printPowerConsumptionHistoryAsterisk () {
-        StringBuilder master = new StringBuilder();
-            master.append(" \t      | PowerConsumption (Watt)\n");
-        StringBuilder columnOneRowA = new StringBuilder(" \t 4000 | ");
-        StringBuilder columnOneRowB = new StringBuilder(" \t 3600 | ");
-        StringBuilder columnOneRowC = new StringBuilder(" \t 3200 | ");
-        StringBuilder columnOneRowD = new StringBuilder(" \t 2800 | ");
-        StringBuilder columnOneRowE = new StringBuilder(" \t 2400 | ");
-        StringBuilder columnOneRowF = new StringBuilder(" \t 2000 | ");
-        StringBuilder columnOneRowG = new StringBuilder(" \t 1600 | ");
-        StringBuilder columnOneRowH = new StringBuilder(" \t 1200 | ");
-        StringBuilder columnOneRowI = new StringBuilder(" \t  800 | ");
-        StringBuilder columnOneRowJ = new StringBuilder(" \t  400 | ");
+    private static final int COL_WIDTH = 5;
+
+    private void printPowerConsumptionHistoryAsterisk() {
+        StringBuilder top = new StringBuilder("\n\n \t      | PowerConsumption (Watt)");
+        StringBuilder rowA = new StringBuilder(" \t 4000 | ");
+        StringBuilder rowB = new StringBuilder(" \t 3600 | ");
+        StringBuilder rowC = new StringBuilder(" \t 3200 | ");
+        StringBuilder rowD = new StringBuilder(" \t 2800 | ");
+        StringBuilder rowE = new StringBuilder(" \t 2400 | ");
+        StringBuilder rowF = new StringBuilder(" \t 2000 | ");
+        StringBuilder rowG = new StringBuilder(" \t 1600 | ");
+        StringBuilder rowH = new StringBuilder(" \t 1200 | ");
+        StringBuilder rowI = new StringBuilder(" \t  800 | ");
+        StringBuilder rowJ = new StringBuilder(" \t  400 | ");
+        StringBuilder rowK = new StringBuilder(" \t   T  | ");
+        StringBuilder rowL = new StringBuilder(" \t   I  | ");
+        StringBuilder rowM = new StringBuilder(" \t   M  | ");
+        StringBuilder rowN = new StringBuilder(" \t   E  | ");
+
+        int recordCounter = 0;
+        for (String[] record : getPowerConsumptionHistory()) {
+            ++recordCounter;
+            if (record != null && record.length > 1) {
+                int power = Integer.parseInt(record[0]);
+                String time = record[1];
+                String[] splitTime = time.split(":");
+
+                int rowIndex = 10 - power / 400;
+                if (rowIndex < 0) rowIndex = 0;
+                if (rowIndex > 9) rowIndex = 9;
+
+                // Define cell contents
+                String cell = "===";
+                String cellFormatted = String.format("%" + COL_WIDTH + "s", cell);
+                if (record[0].equals(getPowerConsumptionHistory().getLast()[0]) || recordCounter == 10) {
+                    cellFormatted = getColor(power) + cellFormatted + TerminalColors.ANSI_RESET;
+                }
+
+                String empty = String.format("%" + COL_WIDTH + "s", "");
+
+                // Append one 'O' per column in correct row
+                rowA.append(rowIndex == 0 ? cellFormatted : empty);
+                rowB.append(rowIndex == 1 ? cellFormatted : empty);
+                rowC.append(rowIndex == 2 ? cellFormatted : empty);
+                rowD.append(rowIndex == 3 ? cellFormatted : empty);
+                rowE.append(rowIndex == 4 ? cellFormatted : empty);
+                rowF.append(rowIndex == 5 ? cellFormatted : empty);
+                rowG.append(rowIndex == 6 ? cellFormatted : empty);
+                rowH.append(rowIndex == 7 ? cellFormatted : empty);
+                rowI.append(rowIndex == 8 ? cellFormatted : empty);
+                rowJ.append(rowIndex == 9 ? cellFormatted : empty);
+
+                // Time labels
+                rowK.append(String.format("%" + COL_WIDTH + "s", "_____"));
+                rowL.append(String.format("%" + COL_WIDTH + "s", splitTime[0] + "h"));
+                rowM.append(String.format("%" + COL_WIDTH + "s", splitTime[1] + "m"));
+                rowN.append(String.format("%" + COL_WIDTH + "s", splitTime[2] + "s"));
+            }
+        }
+
+        print(top, rowA, rowB, rowC, rowD, rowE, rowF);
+        print(rowG, rowH, rowI, rowJ, rowK, rowL, rowM);
+        System.out.print(rowN);
+    }
+
+
+//    private void printPowerConsumptionHistoryAsterisk() {
+//        StringBuilder top = new StringBuilder();
+//        top.append("\n\n \t      | PowerConsumption (Watt)");
+//        StringBuilder rowA = new StringBuilder(" \t 4000 | ");
+//        StringBuilder rowB = new StringBuilder(" \t 3600 | ");
+//        StringBuilder rowC = new StringBuilder(" \t 3200 | ");
+//        StringBuilder rowD = new StringBuilder(" \t 2800 | ");
+//        StringBuilder rowE = new StringBuilder(" \t 2400 | ");
+//        StringBuilder rowF = new StringBuilder(" \t 2000 | ");
+//        StringBuilder rowG = new StringBuilder(" \t 1600 | ");
+//        StringBuilder rowH = new StringBuilder(" \t 1200 | ");
+//        StringBuilder rowI = new StringBuilder(" \t  800 | ");
+//        StringBuilder rowJ = new StringBuilder(" \t  400 | ");
+//        StringBuilder rowK = new StringBuilder(" \t   T  | ");
+//        StringBuilder rowL = new StringBuilder(" \t   I  | ");
+//        StringBuilder rowM = new StringBuilder(" \t   M  | ");
+//        StringBuilder rowN = new StringBuilder(" \t   E  | ");
+//
+
+    /// /        String[][] powerArray = getPowerConsumptionHistory().toArray(new String[0][]);
+    /// /        String latestPower = powerArray.getLast()[0];
+//
+//        for (String[] record : getPowerConsumptionHistory()) {
+//            if (record != null && record.length > 1) {
+//                int power = Integer.parseInt(record[0]);
+//                String time = record[1];
+//                String[] splitTime = time.split(":");
+//
+//                int row = 10 - power / 400;
+//                if (row < 0) row = 0;
+//                if (row > 9) row = 9;
+//
+//                String cell = "  O  ";
+//                if (String.valueOf(power).equals(getPowerConsumptionHistory().getLast()[0])) {
+//                    cell = String.format("%2sO%2s", getColor(power), TerminalColors.ANSI_RESET);
+//                }
+//
+//                // Append to correct row
+//                switch (row) {
+//                    case 0:
+//                        rowA.append(cell);
+//                        break;
+//                    case 1:
+//                        rowB.append(cell);
+//                        break;
+//                    case 2:
+//                        rowC.append(cell);
+//                        break;
+//                    case 3:
+//                        rowD.append(cell);
+//                        break;
+//                    case 4:
+//                        rowE.append(cell);
+//                        break;
+//                    case 5:
+//                        rowF.append(cell);
+//                        break;
+//                    case 6:
+//                        rowG.append(cell);
+//                        break;
+//                    case 7:
+//                        rowH.append(cell);
+//                        break;
+//                    case 8:
+//                        rowI.append(cell);
+//                        break;
+//                    case 9:
+//                        rowJ.append(cell);
+//                        break;
+//                }
+//
+//                // Append time info
+//                rowK.append("_____");
+//                rowL.append(String.format("%5s", splitTime[0] + "h"));
+//                rowM.append(String.format("%5s", splitTime[1] + "m"));
+//                rowN.append(String.format("%5s", splitTime[2] + "s"));
+//            }
+//        }
+//
+//        print(top, rowA, rowB, rowC, rowD, rowE, rowF);
+//        print(rowG, rowH, rowI, rowJ, rowK, rowL, rowM);
+//        System.out.print(rowN);
+//    }
+    private String getColor(int power) {
         String markedPowerConsumptionColor;
-        if (powerConsumption > 3600) {
+        if (power > 3600) {
             markedPowerConsumptionColor = TerminalColors.ANSI_BRIGHT_RED;
-        } else if (powerConsumption <= 3400) {
+        } else if (power <= 3200) {
             markedPowerConsumptionColor = TerminalColors.ANSI_BRIGHT_BLUE;
         } else {
             markedPowerConsumptionColor = TerminalColors.ANSI_BRIGHT_YELLOW;
         }
-            int[] powerPrevious = new int[powerConsumptionHistory.size()];
-            int i = 0;
-        for (String[] record : powerConsumptionHistory) {
-            if (record != null && record.length > 0) {
-                int power = Integer.parseInt(record[0]);
-                String time = record[1];
-                int row = 9 - power/400;
-                StringBuilder column = new StringBuilder();
-                for (int j = 0; j < 10; j++) {
-                    if(j==row){
-                        if(i!=0 && powerPrevious[i-1]>power){
-                            column.append("\\   \n");
-                            column.append(" \\  \n");
-                            column.append("  \\ \n");
-                            column.append(markedPowerConsumptionColor).append("   *").append(TerminalColors.ANSI_RESET).append("\n");
-                        }else if(i!=0 && powerPrevious[i-1]==power){
-                            column.append("---").append(markedPowerConsumptionColor).append("*").append(TerminalColors.ANSI_RESET).append("\n");
-                        }else if(i!=0 && powerPrevious[i-1]<power){
-                            column.append(markedPowerConsumptionColor).append("   *").append(TerminalColors.ANSI_RESET).append("\n");
-                            column.append("  / \n");
-                            column.append(" /  \n");
-                            column.append("/   \n");
-                        }else {
-                            column.append("    ").append(markedPowerConsumptionColor).append("*").append(TerminalColors.ANSI_RESET).append("\n");
-                        }
-                    }else {
-                        column.append("    \n");
-                    }
-                }
-                column.append(time).append("\n");
-                powerPrevious[i++] = power;
-                master.append(column);
-            }
-        }
-        System.out.println(master);
+        return markedPowerConsumptionColor;
+    }
+
+    public void print(StringBuilder top, StringBuilder rowA, StringBuilder rowB, StringBuilder rowC, StringBuilder rowD, StringBuilder rowE, StringBuilder rowF) {
+        System.out.println(top);
+        System.out.println(rowA);
+        System.out.println(rowB);
+        System.out.println(rowC);
+        System.out.println(rowD);
+        System.out.println(rowE);
+        System.out.println(rowF);
     }
 
     @Override
     public void updateObservedValue() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String time = now.format(formatter);
         setPowerConsumption(PowerConsumption.getInstance().getValue());
-        if (powerConsumptionHistory.size() == 10) {
-            powerConsumptionHistory.removeFirst();
+        if (getPowerConsumptionHistory().size() == 10) {
+            getPowerConsumptionHistory().removeFirst();
         }
         int powerConsumption = getPowerConsumption();
-        String[] record = {getPowerConsumption() + "", getTime()};
-        powerConsumptionHistory.addLast(record);
+        String[] record = {getPowerConsumption() + "", time};
+        getPowerConsumptionHistory().addLast(record);
 
         if (powerConsumption > 3600) {
             try {
@@ -171,7 +301,7 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
 
     @Override
     public void simulate() {
-        PowerConsumption.getInstance().startGenerating(0.00, 4000.00, 10.00, 500.00);
+        PowerConsumption.getInstance().startGenerating(400.00, 4000.00, 10.00, 500.00);
         PowerConsumption.getInstance().addObserver(this);
     }
 
@@ -209,9 +339,5 @@ public class Outlet extends SmartDevice implements Switchable, DeviceObserver, S
         return "W";
     }
 
-    private String getTime() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        return now.format(formatter).replace(":", ":\n");
-    }
+
 }
